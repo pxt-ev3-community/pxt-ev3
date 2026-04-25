@@ -72,6 +72,9 @@ jobs:
             cp -R docs/static/. built/packaged/pxt-ev3/beta/docs/static/
             cd built/packaged/pxt-ev3/beta
             ln -s docs/static static
+            mkdir -p blob/4800c370dcc589501253dbfe7027df3b9f3ca883
+            cd blob/4800c370dcc589501253dbfe7027df3b9f3ca883
+            ln -s ../../docs/static static
           fi
 
       - name: Patch html json and manifest only
