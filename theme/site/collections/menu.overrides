@@ -1,12 +1,3 @@
 /*******************************
          Site Overrides
 *******************************/
-
-
-.ui.menu.inverted .item {
-    text-transform: uppercase;
-}
-
-#mainmenu, #homemenu {
-    border-bottom: 5px solid #00a5c8;
-}

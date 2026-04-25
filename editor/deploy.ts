@@ -14,6 +14,7 @@ export function debug() {
 }
 
 // Web Serial API https://wicg.github.io/serial/
+// https://www.npmjs.com/package/@types/web-bluetooth
 // chromium bug https://bugs.chromium.org/p/chromium/issues/detail?id=884928
 // Under experimental features in Chrome Desktop 77+
 enum ParityType {
@@ -23,6 +24,7 @@ enum ParityType {
     "mark",
     "space"
 }
+
 declare interface SerialOptions {
     baudRate?: number;
     databits?: number;
@@ -34,15 +36,18 @@ declare interface SerialOptions {
     xoff?: boolean;
     xany?: boolean;
 }
+
 type SerialPortInfo = pxt.Map<string>;
 type SerialPortRequestOptions = any;
+
 declare class SerialPort {
     open(options?: SerialOptions): Promise<void>;
     close(): void;
     readonly readable: any;
     readonly writable: any;
-    //getInfo(): SerialPortInfo;
+    // getInfo(): SerialPortInfo;
 }
+
 declare interface Serial extends EventTarget {
     onconnect: any;
     ondisconnect: any;
@@ -60,7 +65,11 @@ class WebSerialPackageIO implements pxt.packetio.PacketIO {
     private _writer: any;
 
     constructor(private port: SerialPort, private options: SerialOptions) {
-        console.log(`serial: new io`)
+        console.log(`serial: New io`)
+    }
+
+    bufferSize(buffer: Uint8Array) {
+        return HF2.read16(buffer, 0) + 2;
     }
 
     async readSerialAsync() {
@@ -68,21 +77,28 @@ class WebSerialPackageIO implements pxt.packetio.PacketIO {
         let buffer: Uint8Array;
         const reader = this._reader;
         while (reader === this._reader) { // will change if we recycle the connection
-            const { done, value } = await this._reader.read()
+            const { done, value } = await this._reader.read();
             if (!buffer) buffer = value;
             else { // concat
-                let tmp = new Uint8Array(buffer.length + value.byteLength)
-                tmp.set(buffer, 0)
-                tmp.set(value, buffer.length)
+                let tmp = new Uint8Array(buffer.length + value.byteLength);
+                tmp.set(buffer, 0);
+                tmp.set(value, buffer.length);
                 buffer = tmp;
             }
             if (buffer) {
-                let size = HF2.read16(buffer, 0);
-                if (buffer.length == size + 2) {
+                let size = this.bufferSize(buffer);
+                if (buffer.length == size) {
                     this.onData(new Uint8Array(buffer));
                     buffer = undefined;
+                } else if (buffer.length > size) {
+                    console.warn(`Received larger buffer than command command: ${buffer.length} received but waiting for ${size}`);
+                    let tmp = buffer.slice(0, size - 1);
+                    this.onData(new Uint8Array(tmp));
+                    tmp = buffer.slice(size, buffer.length - 1);
+                    buffer = tmp;
+                    console.debug(`Next buffer size: ${this.bufferSize(buffer)}`);
                 } else {
-                    console.warn("Incomplete command " + size);
+                    console.warn(`Incomplete command: ${buffer.length} received but waiting for ${size}. Keep waiting...`);
                 }
             }
         }
@@ -93,11 +109,14 @@ class WebSerialPackageIO implements pxt.packetio.PacketIO {
     }
 
     static portIos: WebSerialPackageIO[] = [];
+
     static async mkPacketIOAsync(): Promise<pxt.packetio.PacketIO> {
         const serial = (<any>navigator).serial;
         if (serial) {
             try {
-                const requestOptions: SerialPortRequestOptions = {};
+                const requestOptions: SerialPortRequestOptions = {
+                    // filters: [{ usbVendorId: 0x0694, usbProductId: 0x0005 }],
+                };
                 const port = await serial.requestPort(requestOptions);
 
                 let io = WebSerialPackageIO.portIos.filter(i => i.port == port)[0];
@@ -111,7 +130,7 @@ class WebSerialPackageIO implements pxt.packetio.PacketIO {
                 }
                 return io;
             } catch (e) {
-                console.log(`connection error`, e)
+                console.log(`Connection error`, e)
             }
         }
         throw new Error("could not open serial port");
@@ -123,7 +142,8 @@ class WebSerialPackageIO implements pxt.packetio.PacketIO {
     }
 
     private openAsync() {
-        console.log(`serial: opening port`)
+        console.log(`serial: Opening port`);
+        // this.io.onConnectionChanged();
         if (!!this._reader) return Promise.resolve();
         this._reader = undefined;
         this._writer = undefined;
@@ -189,6 +209,7 @@ function hf2Async() {
 
 let useHID = false;
 let useWebSerial = false;
+
 export function initAsync(): Promise<void> {
     if (pxt.U.isNodeJS) {
         // doesn't seem to work ATM
@@ -234,6 +255,7 @@ async function cleanupAsync() {
 }
 
 let initPromise: Promise<Ev3Wrapper>
+
 function initHidAsync() { // needs to run within a click handler
     if (initPromise)
         return initPromise
@@ -261,6 +283,7 @@ const rbfTemplate = `
 4c45474f580000006d000100000000001c000000000000000e000000821b038405018130813e8053
 74617274696e672e2e2e0084006080XX00448581644886488405018130813e80427965210084000a
 `
+
 export function deployCoreAsync(resp: pxtc.CompileResult) {
     let filename = resp.downloadFileBaseName || "pxt"
     filename = filename.replace(/^lego-/, "")

@@ -1,11 +1,11 @@
-namespace storage {
+enum Separators {
+    //% block="comma"
+    Comma,
+    //% block="semicolon"
+    Semicolon
+}
 
-    export enum Separators {
-        //% block="comma"
-        Comma,
-        //% block="semicolon"
-        Semicolon
-    }
+namespace storage {
 
     //% shim=storage::__unlink
     function __unlink(filename: string): void { }

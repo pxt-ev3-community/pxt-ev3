@@ -80,7 +80,7 @@
         },
         "breakBlock": true,
         "continueBlock": true,
-        "bannedCategories": []
+        "bannedCategories": ["images"]
     },
     "compileService": {
         "buildEngine": "dockermake",
@@ -110,6 +110,8 @@
         "copyrightText": "LEGO, the LEGO logo, MINDSTORMS and the MINDSTORMS EV3 logo are trademarks and/ or copyrights of the LEGO Group. ©2018 The LEGO Group. All rights reserved.",
         "crowdinProject": "makecode",
         "selectLanguage": true,
+        "defaultColorTheme": "ev3-light",
+        "highContrastColorTheme": "pxt-high-contrast",
         "blocksCollapsing": true,
         "highContrast": true,
         "greenScreen": true,
@@ -151,7 +153,7 @@
         "print": true,
         "showHomeScreen": true,
         "homeScreenHero": "./static/hero.png",
-        "invertedMenu": false,
+        "invertedMenu": true,
         "invertedMonaco": false,
         "monacoToolbox": true,
         "invertedToolbox": false,
@@ -169,15 +171,20 @@
         "importExtensionFiles": true,
         "allowPackageExtensions": true,
         "addNewTypeScriptFile": true,
+        "enabledFeatures": {
+            "blocksErrorList": {},
+            "aiErrorHelp": {}
+        },
         "experiments": [
             "alwaysGithubItemBlocks",
-            "blocksErrorList"
+            "debugExtensionCode",
+            "forceEnableAiErrorHelp"
         ],
         "blocklyOptions": {
             "grid": {
                 "spacing": 40,
                 "length": 2,
-                "colour": "#ddd"
+                "colour": "#C6C6C6"
             }
         },
         "blockColors": {
@@ -206,7 +213,7 @@
         "monacoColors": {
             "editor.background": "#f9f9f9"
         },
-        "fileNameExclusiveFilter": "[^a-zA-Z0-9]",
+        "fileNameExclusiveFilter": "[^a-zA-Z0-9_]",
         "qrCode": true,
         "shareFinishedTutorials": true,
         "nameProjectFirst": true,
@@ -214,7 +221,10 @@
         "githubEditor": true,
         "chooseLanguageRestrictionOnNewProject": true,
         "openProjectNewTab": true,
-        "python": true
+        "python": true,
+        "timeMachine": true,
+        "timeMachineDiffInterval": 600000,
+        "timeMachineSnapshotInterval": 1800000
     },
     "ignoreDocsErrors": true,
     "uploadDocs": true

@@ -359,11 +359,13 @@ namespace sensors.internal {
         
         protected mode: number; // the mode user asked for
         protected realmode: number;
+        protected undetectable: boolean; // not all NXT analog sensors can be detected
 
         constructor(port: number) {
             super(port);
             this.mode = 0;
             this.realmode = 0;
+            this.undetectable = false;
         }
 
         _activated() {
@@ -376,14 +378,14 @@ namespace sensors.internal {
             this.mode = v;
             if (!this.isActive()) return;
             if (this.realmode != this.mode) {
-                control.dmesg(`_setMode p=${this._port} m: ${this.realmode} -> ${v}`);
+                // control.dmesg(`_setMode p=${this._port} m: ${this.realmode} -> ${v}`);
                 this.realmode = v;
                 setAnalogMode(this._port, this._deviceType(), this.mode);
             }
         }
 
         _readPin1() {
-            if (!this.isActive()) return 0;
+            if (!this.undetectable && !this.isActive()) return 0;
             return analogMM.getNumber(NumberFormat.Int16LE, AnalogOff.InPin1 + 2 * this._port);
         }
 

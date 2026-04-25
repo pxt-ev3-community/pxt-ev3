@@ -29,7 +29,9 @@ namespace pxsim.MMapMethods {
         destroy() {
         }
         buf(): Buffer {
-            return { data: this.impl.data } as any
+            const b = pxsim.BufferMethods.createBuffer(this.impl.data.length);
+            b.data.set(this.impl.data);
+            return b;
         }
     }
 
@@ -77,11 +79,10 @@ namespace pxsim.MMapMethods {
 }
 
 namespace pxsim.control {
-
     export function mmap(filename: string, size: number, offset: number): MMapMethods.MMap {
-        let impl = MMapMethods.mmapRegistry[filename]
-        if (!impl) impl = {}
-        return new MMapMethods.MMap(impl, size)
+        let impl = MMapMethods.mmapRegistry[filename] || {};
+        const m = new MMapMethods.MMap(impl, size);
+        return m;
     }
 }
 

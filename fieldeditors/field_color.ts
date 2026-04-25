@@ -1,18 +1,55 @@
-/// <reference path="../node_modules/pxt-core/localtypings/blockly.d.ts"/>
-/// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
+/// <reference path="../node_modules/pxt-core/localtypings/pxtblockly.d.ts"/>
 
-export interface FieldColorEnumOptions extends pxtblockly.FieldColourNumberOptions {
+const pxtblockly = pxt.blocks.requirePxtBlockly()
+const Blockly = pxt.blocks.requireBlockly();
+
+export interface FieldColorEnumOptions {
+    className?: string;
 }
 
-export class FieldColorEnum extends pxtblockly.FieldColorNumber implements Blockly.FieldCustom {
+export class FieldColorEnum extends pxtblockly.FieldColorNumber {
 
     public isFieldCustom_ = true;
-    private paramsData: any[];
 
-    constructor(text: string, params: FieldColorEnumOptions, opt_validator?: Function) {
-        super(text, params, opt_validator);
+    private paramsData: any[];
+    private className_: string;
+
+    private static colorNonePatternCreated = false;
+
+    constructor(text: string, params: FieldColorEnumOptions) {
+        super(text, params as any);
 
         this.paramsData = params["data"];
+        this.className_ = params.className;
+        
+        if (!FieldColorEnum.colorNonePatternCreated) {
+            FieldColorEnum.colorNonePatternCreated = true;
+            const svg = document.querySelector(".blocklySvg") as SVGSVGElement;
+            if (svg) {
+                let defs = svg.querySelector("defs");
+                if (!defs) {
+                    defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+                    svg.prepend(defs);
+                }
+
+                if (!defs.querySelector("#legoColorNonePattern")) {
+                    defs.insertAdjacentHTML("beforeend", `
+                        <pattern id="legoColorNonePattern" width="1.2" height="1.2" x="-0.1" y="-0.1" viewBox="0 0 1 1" patternUnits="objectBoundingBox" patternContentUnits="objectBoundingBox">
+                            <rect width="1" height="1" fill="#ffffff"/>
+                            <rect width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.5" y="0" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.25" y="0.25" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.75" y="0.25" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0" y="0.5" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.5" y="0.5" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.25" y="0.75" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <rect x="0.75" y="0.75" width="0.25" height="0.25" fill="#cfd8dc"/>
+                            <line x1="0" y1="1" x2="1" y2="0" stroke="#ff3b30" stroke-width="0.08" stroke-linecap="round"/>
+                        </pattern>
+                    `);
+                }
+            }
+        }
     }
 
     mapColour(enumString: string) {
@@ -42,15 +79,44 @@ export class FieldColorEnum extends pxtblockly.FieldColorNumber implements Block
         }
     }
 
+    rgbToHex(rgb: string) {
+        const result = rgb.match(/\d+/g);
+        if (!result) return rgb;
+        return "#" + result.map(x => parseInt(x).toString(16).padStart(2, "0")).join("");
+    }
+
     showEditor_() {
         super.showEditor_();
-        const colorCells = document.querySelectorAll('.legoColorPicker td');
+        const picker = Blockly.DropDownDiv.getContentDiv().childNodes[0] as HTMLElement;
+        if (this.className_ && picker) {
+            pxt.BrowserUtils.addClass(picker as HTMLElement, this.className_);
+        }
+        const colorCells = picker.querySelectorAll('.blocklyColourSwatch');
         colorCells.forEach((cell) => {
-            const titleName = this.mapColour(cell.getAttribute("title"));
+            const rgbColor = window.getComputedStyle(cell as HTMLElement).backgroundColor;
+            const hexColor = this.rgbToHex(rgbColor);
+            const titleName = this.mapColour(hexColor);
             const index = this.paramsData.findIndex(item => item[1] === titleName);
+            if (index === -1) return;
+            const enumName = this.paramsData[index][1]?.replace("ColorSensorColor.", "") ?? "None";
+            cell.classList.add(`legoColor${enumName}`);
             cell.setAttribute("title", this.paramsData[index][0]);
         });
     }
+
+    doValueUpdate_(colour: string) {
+        super.doValueUpdate_(colour);
+        this.applyColour();
+    }
+
+    applyColour() {
+        if (this.borderRect_) {
+            this.borderRect_.style.fill = this.value_;
+        } else if (this.sourceBlock_) {
+            (this.sourceBlock_ as any)?.pathObject?.svgPath?.setAttribute('fill', this.value_);
+            (this.sourceBlock_ as any)?.pathObject?.svgPath?.setAttribute('stroke', '#fff');
+        }
+    };
 
     /**
      * Return the current colour.
@@ -70,15 +136,32 @@ export class FieldColorEnum extends pxtblockly.FieldColorNumber implements Block
      * @param {string} colour The new colour in '#rrggbb' format.
      */
     setValue(colorStr: string) {
-        let colour = this.mapEnum(colorStr);
-        if (this.sourceBlock_ && Blockly.Events.isEnabled() &&
-            this.value_ != colour) {
-            Blockly.Events.fire(new (Blockly as any).Events.BlockChange(
-                this.sourceBlock_, 'field', this.name, this.value_, colour));
+        // Convert 0xHEX -> #HEX
+        if (colorStr && colorStr.startsWith("0x")) {
+            colorStr = "#" + colorStr.substring(2);
         }
-        this.value_ = colour;
-        if (this.sourceBlock_) {
-            this.sourceBlock_.setColour(colour);
+        // Enum -> HEX
+        if (colorStr && colorStr.startsWith("ColorSensorColor.")) {
+            colorStr = this.mapEnum(colorStr);
+        }
+        let sourceBlock = this.sourceBlock_ as any;
+        if (sourceBlock && Blockly.Events.isEnabled() && this.value_ != colorStr) {
+            Blockly.Events.fire(new (Blockly as any).Events.BlockChange(sourceBlock, 'field', this.name, this.value_, colorStr));
+        }
+        this.value_ = colorStr;
+        if (sourceBlock) {
+            sourceBlock.setColour(colorStr);
+            const group = sourceBlock.svgGroup;
+            if (group) {
+                // Remove old color classes
+                group.classList.forEach((c: string) => {
+                    if (c.startsWith("legoColor")) group.classList.remove(c);
+                });
+                // Get enum name and set as class
+                const enumName = this.mapColour(colorStr)?.replace("ColorSensorColor.", "") ?? "None";
+                sourceBlock.svgGroup?.classList.add("legoColor" + enumName);
+            }
         }
     }
+    
 }

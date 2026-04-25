@@ -2,10 +2,12 @@
      User Global Variables
 *******************************/
 
-@fontName  : 'Open Sans';
+@importGoogleFonts: false;
 
 @headerFont        : "Open Sans","Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif;
 @pageFont          : "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+
+@fontName  : 'Open Sans';
 
 @primaryColor: @blue;
 @secondaryColor: @yellow;
@@ -66,28 +68,6 @@
 @nougat: #CB5F32;
 @brickYellow: #D0AD68;
 
-/* Effects */
-@silver: #7A8284;
-@warmGold: #996C23;
-@metallicDarkGrey: #38302D;
-@phosphorusGreen: #FEFBCC;
-
-/* Transparent */
-@transparentYellow: #F7EB58;
-@transparentBrightOrange: #E5630F;
-@transparentReddishOrange: #DF5338;
-@transparentRed: #D61F1F;
-@transparentReddishViolet: #E88BB6;
-@transparentBrightBluishViolet: #8A83BA;
-@transparentLightBlue: #A8D9E5;
-@transparentBlue: #42A1E2;
-@transparentFluorescentBlue: #C3DCF3;
-@transparentGreen: #52A35B;
-@transparentBrightGreen: #8AFF55;
-@transparentFluorescentGreen: #F8E94B;
-@transparentBrown: #957F6F;
-@transparent: #EAEAEA;
-
 @pageBackground: #fff;
 
 @positiveColor: @blue;
@@ -99,19 +79,10 @@
          PXT Overrides
 *******************************/
 
-/*@loaderImageUrl: "../docs/static/MC-LEGO-loader-eyes.gif";*/
-
 /*-------------------
    Menu
 --------------------*/
 
-@mainMenuBackground: @legoGreyLight;
-@mainMenuInvertedBackground: @darkGrey;
-@mainMenuTutorialBackground: @orange;
-
-@mainMenuBlocksJsToggleColor: @primaryColor;
-
-@tutorialSelectedMenuColor: @blue;
 
 /*-------------------
    Layout
@@ -153,13 +124,6 @@
 @homeDetailCloseBackground: @darkGrey;
 
 /*-------------------
-   Editor
---------------------*/
-
-@blocklyToolboxColor: #FFF; /*#FAC80A;*/
-@trashIconColor: #FAC80A; /*white*/
-
-/*-------------------
    Blockly
 --------------------*/
 
@@ -173,22 +137,6 @@
 @blocklyRowHeightTablet: 45px;
 @blocklyRowHeightMobile: 45px;
 
-
-/*-------------------
-   Flyout
---------------------*/
-
-@flyoutLabelColor: white;
-@blocklyFlyoutColor: #3B3C3D;
-@blocklyFlyoutColorOpacity: 1.0;
-@monacoFlyoutColor: rgba(59, 60, 61, 1.0);
-
-/*-------------------
-   Tutorial
---------------------*/
-
-@tutorialSegmentBackground: #f2f2f2;
-
 /*-------------------
    Serial
 --------------------*/
@@ -196,9 +144,3 @@
 @serialBackgroundColor: #fff;
 @serialGraphBackground: #F2F2F2;
 @serialConsoleBackground: @serialGraphBackground;
-
-/*-------------------
-   Extensions
---------------------*/
-
-@extensionsHeaderBackground: @darkGrey;

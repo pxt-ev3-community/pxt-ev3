@@ -1,0 +1,58 @@
+/* Lots of specificity to override another !important rule */
+
+/* Blockly toolbox colors */
+.blocklyToolbox, .monacoToolboxDiv {
+    background: var(--pxt-neutral-background1) !important;
+    color: var(--pxt-neutral-foreground1) !important;
+}
+
+/* Blockly flyout background */
+/* .blocklyFlyoutBackground {
+    fill: var(--pxt-neutral-background3) !important;
+    fill-opacity: .9 !important;
+} */
+
+/* Positive button */
+.ui.button.positive {
+    background-color: var(--pxt-primary-background) !important;
+    color: var(--pxt-primary-foreground) !important;
+    border: 1px solid var(--pxt-primary-background) !important;
+}
+
+/* Bluetooth button in download dialog */
+.ui.button.bluetooth {
+    background-color: var(--pxt-colors-blue-background) !important;
+    color: var(--pxt-colors-blue-foreground) !important;
+}
+
+/* Card label */
+.common-card-label {
+    background-color: var(--pxt-colors-orange-background);
+    border-color: var(--pxt-colors-orange-hover);
+}
+
+/* Filemenu item hover */
+#simulator .editor-sidebar .filemenu .item:hover,
+    #simulator .editor-sidebar .filemenu .link.item:hover {
+    background: var(--pxt-neutral-alpha5) !important;
+}
+
+/* Common modal */
+.common-modal-header, .common-modal-body {
+    color: var(--pxt-neutral-base);
+}
+
+/* Common extension card */
+.common-extension-card {
+    color: var(--pxt-neutral-base) !important;
+}
+
+/* Blockly trash icon */
+#blocklyTrashIcon {
+    color: var(--pxt-colors-red-background) !important;
+}
+
+/* Lego and Microsoft logos separator */
+.menubar .ui.menu .brand:before {
+    border-left: 2px solid var(--pxt-neutral-alpha40);
+}

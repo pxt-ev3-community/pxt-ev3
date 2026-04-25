@@ -28,31 +28,55 @@
     ry: 0 !important;
 }
 
-.blocklyDropDownButton {
-    border-radius: 0px !important;
+/* Field editor */
+.blocklyMotorsFieldOptions .blocklyDropDownButton, .blocklyMusicFieldOptions .blocklyDropDownButton {
+    height: 100%;
 }
 
-/* Music field editor */
-
-.blocklyMusicFieldOptions .blocklyDropdownText, .blocklyMusicFieldCategories .blocklyDropdownText {
-    display: flex;
-    justify-content: center;
-    line-height: 1.5rem;
+.blocklyDropDownMotorsContent .blocklyMotorsFieldOptions .blocklyDropdownTextLabel {
+    display: inline-block;
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: inherit;
+    padding: 0 10px;
+    line-height: 1rem;
     color: #fff;
     font-size: 13px;
 }
 
+.blocklyDropDownMusicContent {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.blocklyMotorsFieldOptions div[role="row"], .blocklyMusicFieldOptions div[role="row"] {
+    display: flex;
+}
+
+.blocklyMusicFieldCategories .blocklyDropdownText, .blocklyMusicFieldOptions .blocklyDropdownText {
+    // display: flex;
+    // justify-content: center;
+    line-height: 1rem;
+    color: #fff;
+    font-size: 13px;
+}
+
+.blocklyMusicFieldOptions .blocklyDropdownText {
+    display: block;
+    margin-bottom: 5%;
+    padding: 0px 8px;
+    word-break: break-word;
+    hyphens: auto;
+}
+
 .blocklyMusicFieldCategories {
-    position: absolute;
     text-align: center;
     left: 0;
     right: 0;
     top: 0;
     width: 100%;
     font-size: 13px;
-}
-.blocklyMusicFieldOptions {
-    margin-top: 80px;
 }
 
 .blocklyDropdownTag {
@@ -64,4 +88,17 @@
     border: 1px solid;
     transition: box-shadow .1s;
     cursor: pointer;
+}
+
+.blocklyMotorsFieldOptions .blocklyDropDownButton > img, .blocklyMusicFieldOptions .blocklyDropDownButton > img {
+    position: relative;
+    width: 80%;
+    height: auto;
+    transform: unset;
+    top: unset;
+}
+
+// Default DropDownContent
+.blocklyDropDownContent {
+    overflow-y: auto; // Return scroll y
 }

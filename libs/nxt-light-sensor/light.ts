@@ -94,7 +94,9 @@ namespace sensors {
         //% blockId=nxtLight
         //% parts="nxtlightsensor"
         //% blockNamespace=sensors
-        //% this.fieldEditor="ports"
+        //% this.fieldEditor="images"
+        //% this.fieldOptions.columns="4"
+        //% this.fieldOptions.width="300"
         //% weight=99 blockGap=8
         //% subcategory="NXT"
         //% group="Light Sensor"
@@ -126,7 +128,9 @@ namespace sensors {
         //% blockId=setReflectedLightRange
         //% parts="nxtlightsensor"
         //% blockNamespace=sensors
-        //% this.fieldEditor="ports"
+        //% this.fieldEditor="images"
+        //% this.fieldOptions.columns="4"
+        //% this.fieldOptions.width="300"
         //% weight=89 blockGap=8
         //% subcategory="NXT"
         //% group="Light Sensor"
@@ -147,7 +151,9 @@ namespace sensors {
         //% blockId=setAmbientLightRange
         //% parts="nxtlightsensor"
         //% blockNamespace=sensors
-        //% this.fieldEditor="ports"
+        //% this.fieldEditor="images"
+        //% this.fieldOptions.columns="4"
+        //% this.fieldOptions.width="300"
         //% weight=88 blockGap=8
         //% subcategory="NXT"
         //% group="Light Sensor"
@@ -189,6 +195,7 @@ namespace sensors {
          */
         //%
         reflectetLight() {
+            if (!this.isActive()) return 0;
             let reflectedVal = Math.map(this.readValue(), this.darkReflectedLight, this.brightReflectedLight, 0, 100);
             reflectedVal = Math.round(Math.constrain(reflectedVal, 0, 100));
             return reflectedVal;
@@ -199,6 +206,7 @@ namespace sensors {
          */
         //%
         ambientLight() {
+            if (!this.isActive()) return 0;
             let ambientVal = Math.map(this.readValue(), this.darkAmbientLight, this.brightAmbientLight, 0, 100);
             ambientVal = Math.round(Math.constrain(ambientVal, 0, 100));
             return ambientVal;

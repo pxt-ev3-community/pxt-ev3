@@ -16,10 +16,6 @@
 /*******************************
     Add your custom CSS here
 *******************************/
-.simframe.ui.embed {
-    background: transparent;
-}
-
 
 /* Open Sans font */
 @font-face  {
@@ -31,27 +27,437 @@
          data-uri('../docs/static/fonts/Open_Sans/OpenSans-Regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
-.ui.button.download-button {
-    &:extend(.ui.primary.button all);
-}
 
-@buttonBackgroundColor: white;
-@buttonForegroundColor: #5E5E5E;
-
-.ui.button.editortools-btn, .simtoolbar .ui.button,
-    .ui.button.collapse-button, .ui.button.collapsed-button {
-    background-color: @buttonBackgroundColor;
-    color: @buttonForegroundColor;
+/*******************************
+    Editor tools panel
+*******************************/
+/* Editor tools buttons */
+.ui.button.editortools-btn, 
+    .simtoolbar .ui.button, 
+    .ui.button.collapsed-button, 
+    .ui.button.editortools-btn {
+    background-color: var(--pxt-neutral-background1);
+    color: var(--pxt-neutral-foreground1); // #5E5E5E
     border: none !important;
     box-shadow: none !important;
 }
-.ui.button.editortools-btn:hover, 
-.ui.button.editortools-btn:focus {
-    color: darken(@buttonForegroundColor, 0.2) !important;
+.ui.button.editortools-btn:hover, .ui.button.editortools-btn:focus {
+    color: var(--pxt-neutral-foreground1); // #5E5E5E
+    background-color: var(--pxt-neutral-alpha10);
 }
 
+/* Project name input */
 .ui.input.projectname-input input {
-    box-shadow: none; border: none !important;
+    box-shadow: none;
+    border: none !important;
+}
+
+/* Download button parrent background fix at simulator collapsed */
+/* Bug for all pxt editors */
+#editortools #downloadArea {
+    background: none !important;
+    padding: 11px 1rem;
+}
+/* downloadArea editortools-btn hover, active, focus */
+#downloadArea .ui.button.editortools-btn:hover,
+    #downloadArea .ui.button.editortools-btn:active,
+    #downloadArea .ui.button.editortools-btn:focus {
+    background-color: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-neutral-foreground1) !important;
+}
+
+
+
+/*******************************
+    Menu bar
+*******************************/
+/* Main menu border bottom line */
+#mainmenu {
+    border-bottom: 5px solid var(--pxt-header-stencil);
+}
+
+/* Menu bar main menu buttons */
+.ui.inverted.menu .item,
+    .ui.inverted.menu .item>a:not(.ui), 
+    .ui.menu .common-button.menu-button {
+    color: var(--pxt-tertiary-foreground) !important;
+}
+/* Menu bar main menu buttons hover */
+#mainmenu.ui.inverted.menu .menu>.dropdown.item:focus, 
+    #mainmenu.ui.inverted.menu .menu>.link.item.icon:focus, 
+    #mainmenu.ui.link.inverted.menu .menu>.dropdown.item:focus, 
+    #mainmenu.ui.link.inverted.menu .menu>.link.item.icon:focus {
+    color: var(--pxt-tertiary-foreground-hover) !important;
+}
+
+/* Menu bar main menu buttons hover, focus */
+.ui.menu .common-button.menu-button:hover, 
+    .menu .link.item:hover, 
+    .menu>.link.item.icon:focus {
+    color: var(--pxt-tertiary-foreground-hover) !important;
+}
+/* Disable boarder/outline of buttons in the toolbar */
+#mainmenu.ui.inverted.menu .menu>.dropdown.item:focus, 
+    #mainmenu.ui.inverted.menu .menu>.link.item.icon:focus, 
+    #mainmenu.ui.link.inverted.menu .menu>.dropdown.item:focus, 
+    #mainmenu.ui.link.inverted.menu .menu>.link.item.icon:focus {
+    border: 3px solid transparent;
+    outline: none;
+}
+
+/* Menu bar menu bar editor menuitem grid */
+.menubar .ui.menu.fixed .item.editor-menuitem .ui.grid {
+    background: color-mix(in srgb, var(--pxt-primary-background) 10%, transparent) !important;
+    border: 1px solid var(--pxt-neutral-alpha40);
+    border-radius: 0px !important;
+}
+
+/* Menu bar menu bar editor menuitem item */
+.menubar .ui.menu.fixed .ui.item.editor-menuitem .item {
+    border-radius: 0px !important;
+}
+
+.menubar .ui.menu.fixed .ui.item.editor-menuitem .item.link:hover, 
+    .menubar .ui.inverted.menu .link.item:active, 
+    .ui.inverted.menu .dropdown.item:hover {
+    background: var(--pxt-neutral-alpha10);
+    color: var(--pxt-target-foreground1-hover);
+}
+
+/* Menu bar menu bar editor menuitem item active */
+.menubar .ui.menu.inverted.fixed .ui.item.editor-menuitem .active.item {
+    color: var(--pxt-header-foreground) !important;
+}
+
+
+
+/* Editor menu dropdown */
+#editordropdown {
+    padding: 0 1em; /* Aligning the arrow icon */
+}
+
+/* Blocks or text JS / Python active toggle color */
+.ui.item.editor-menuitem .active~.item.toggle {
+    background: var(--pxt-primary-background) !important;
+}
+
+/* Text JS / Python selected or editordropdown is active */
+.main:not(.hc) #editordropdown #mainmenu #editordropdown.active:focus, 
+    .main:not(.hc) #editordropdown.active {
+    background-color: var(--pxt-primary-background) !important;
+}
+
+
+
+/*******************************
+    Download modal
+*******************************/
+/* Download content */
+.ui.downloaddialog.modal>.content {
+    padding: 1rem;
+}
+/* Download actions */
+.ui.downloaddialog.modal>.actions {
+    background-color: #FAFAFA;
+}
+
+
+
+/*******************************
+    Tutorial
+*******************************/
+/* Tutorial */
+#tutorialcard .ui.tutorialsegment {
+    border-radius: 0;
+}
+
+
+
+/*******************************
+    Gallery card
+*******************************/
+/* Card */
+.gallerysegment .ui.card, 
+    .scriptmanager .ui.cards .ui.card {
+    border: 5px solid #f2f2f2 !important;
+}
+.gallerysegment .ui.card:hover, 
+    .scriptmanager .ui.cards .ui.card:hover {
+    border: 5px solid var(--pxt-neutral-background1) !important;
+    background-color: #f2f2f2 !important;
+}
+
+
+
+/*******************************
+    Header
+*******************************/
+/* Main menu buttons */
+#mainmenu.ui.inverted.menu .menu>.dropdown.item:focus {
+    color: var(--pxt-tertiary-foreground-hover);
+}
+
+
+
+/*******************************
+    Blockly toolbox
+*******************************/
+// blocklyToolbox
+// .blocklyToolbox, 
+//     .monacoToolboxDiv {
+//     padding: .5rem;
+// }
+/* Blockly search area */
+#blocklySearchArea {
+    padding: 0.5rem;
+}
+/* Blockly tree row item */
+.coloredToolbox .blocklyTreeRoot div.blocklyTreeRow {
+    padding: 0 0.5rem !important;
+}
+
+
+/*******************************
+    Fullscreen modal
+*******************************/
+/* Header */
+.ui.fullscreen.modal>.header {
+    background-color: var(--pxt-header-secondary-background) !important;
+    color: var(--pxt-header-secondary-foreground) !important;
+}
+
+
+
+/*******************************
+    Simulator
+*******************************/
+/* Simulator background imgage */
+#simulator .editor-sidebar {
+    background: @simulatorBackground data-uri("../docs/static/backgrounds/simulator.png") 0 0 repeat !important;
+}
+/* Simulator fullscreen-button size */
+#simulator .editor-sidebar .simtoolbar .fullscreen-button i {
+    font-size: 1.1em;
+}
+
+
+
+/*******************************
+    Fullscreen simulator
+*******************************/
+/* Menu bar main menu simulator fullscreen */
+.fullscreensim .menubar .ui.menu {
+    border-bottom: 5px solid transparent !important; /* Remove strip */
+}
+
+.fullscreensim .simPanel {
+    background: @simulatorBackground data-uri("../docs/static/backgrounds/simulator.png") 0 0 repeat !important;
+}
+
+.fullscreensim #boardview {
+    background: transparent !important;
+}
+
+
+
+/*******************************
+    Filemenu
+*******************************/
+/* Filemenu */
+#simulator .editor-sidebar .filemenu {
+    background: var(--pxt-neutral-background1);
+    color: var(--pxt-neutral-foreground1);
+}
+/* Item */
+#simulator .editor-sidebar .filemenu .item, 
+    #simulator .editor-sidebar .filemenu .link.item {
+    color: var(--pxt-neutral-foreground1) !important;
+}
+/* Item hover */
+#simulator .editor-sidebar .filemenu .item:hover, 
+    #simulator .editor-sidebar .filemenu .link.item:hover {
+    background: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-neutral-base) !important;
+}
+/* Item horizontal line */
+.ui.inverted.menu .item:before,
+    .ui.vertical.inverted.menu .item:before {
+    background: var(--pxt-neutral-alpha10);
+}
+
+
+
+/*******************************
+    Togglesim and docstoogle
+*******************************/
+/* Togglesim position */
+#computertogglesim, 
+    #mobiletogglesim {
+    left: -22px;
+}
+/* Togglesim color */
+#computertogglesim, 
+    #mobiletogglesim, 
+    #sidedocstoggle {
+    background: var(--pxt-neutral-alpha30) !important;
+}
+
+
+
+/*******************************
+    Common modal header
+*******************************/
+/* Fullscreen common modal header */
+.fullscreen.extensions-browser .common-modal .common-modal-header {
+    background-color: var(--pxt-header-secondary-background) !important;
+}
+/* Back btn */
+.fullscreen>.common-modal>.common-modal-header .common-modal-back:focus-within {
+    border: none;
+}
+/* Close button hover */
+.common-button.menu-button:hover {
+    background: var(--pxt-neutral-alpha10);
+    color: var(--pxt-neutral-background1);
+}
+
+
+
+/*******************************
+    Language modal
+*******************************/
+#langmodal #availablelocales .langoption .header {
+    color: var(--pxt-target-foreground1);
+}
+
+
+
+/*******************************
+    Time machine
+*******************************/
+/* Time machine header */
+.time-machine-header {
+    background-color: var(--pxt-header-secondary-background) !important;
+    color: var(--pxt-header-secondary-foreground) !important;
+    border-bottom: 1px solid var(--pxt-neutral-stencil1) !important;
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+}
+/* Time machine header actions buttons */
+.time-machine-header .time-machine-actions .common-button {
+    border-radius: 0 !important;
+}
+/* Menu button min widht unset */
+.time-machine-header .common-button.menu-button {
+    min-width: unset !important;
+}
+/* Menu button font size */
+.time-machine-header .common-button.menu-button .common-button-label {
+    font-size: 20px !important;
+}
+/* Menu button icon size */
+.time-machine-header .common-button.menu-button i.fas {
+    font-size: 24px !important;
+}
+/* Time machine preview overlap when loading div */
+.time-machine-preview>div {
+    background: var(--pxt-target-background1) !important;
+}
+
+
+
+/*******************************
+    Buttons
+*******************************/
+.common-button.menu-button .icon, 
+    .ui.menu .icon.item>.icon {
+    margin: 0;
+}
+
+/* Neutral button */
+body.pxt-theme-root .common-button.neutral, 
+    body.pxt-theme-root .ui.button.neutral {
+    border: none !important;
+    box-shadow: none !important;
+    color: var(--pxt-neutral-foreground2) !important;
+    border-radius: 0;
+}
+
+/* Green or positive button */
+body.pxt-theme-root .common-button.green, 
+    body.pxt-theme-root .common-button.positive, 
+    body.pxt-theme-root .ui.button.green, 
+    body.pxt-theme-root .ui.button.positive {
+    border: none;
+    border-radius: 0;
+    padding: .78571429em 1.5em;
+}
+
+/* Red of negative button */
+body.pxt-theme-root .common-button.negative, 
+    body.pxt-theme-root .common-button.red, 
+    body.pxt-theme-root .ui.button.negative, 
+    body.pxt-theme-root .ui.button.red {
+    border: 0;
+    padding: .78571429em 1.5em;
+    border-radius: 0;
+}
+
+/* Approve secondary button in focus fix */
+.ui.modal .ui.button.approve.secondary:focus {
+    background-color: var(--pxt-secondary-background-hover) !important;
+}
+
+/* Button primary */
+body.pxt-theme-root .common-button.primary, 
+    body.pxt-theme-root .ui.button.primary {
+    border-radius: 0;
+}
+
+
+
+/*******************************
+    Fullscreen modal
+*******************************/
+/* Fullscreen modal header header-close */
+.ui.fullscreen.modal>.header .header-close {
+    display: flex;
+    flex-basis: auto;
+    height: 100%;
+    padding: 0;
+}
+
+/* Fullscreen modal header header-help */
+.ui.fullscreen.modal>.header .header-help {
+    flex-basis: auto;
+    height: 100%;
+    padding: 0;
+}
+
+/* Fullscreen modal back-btn and help-btn */
+.ui.fullscreen.modal .ui.button.back-button,
+    .ui.fullscreen.modal .ui.help-button {
+    display: flex;
+    align-items: center;
+    padding: 0 16px !important;
+    margin: 0;
+    text-decoration: none;
+    outline: none;
+}
+
+/* Fullscreen modal back-btn and help-btn icons */
+.ui.fullscreen.modal>.header .header-help .help-button .icon {
+    height: auto;
+}
+
+
+
+/*******************************
+    After
+*******************************/
+/* New in main label */
+.ui.red.ribbon.label {
+    border-color: var(--pxt-colors-red-hover) !important;
 }
 
 .ui.button.getting-started-btn {
@@ -62,80 +468,61 @@
     &:extend(.ui.blue.button all);
 }
 
-/* Menu bar colors */
-.ui.menu .ui.item {
-    color: #4A4A4A;
-}
-.fullscreensim .menubar .ui.menu {
-    box-shadow: none !important;
-    border-bottom: 0 !important;
-}
-
-/* logo */
-#logo a.ui.image .ui.logo {
-    min-width: 2.0rem;
-}
-
-/* lego and microsoft logos separator */
-.menubar .ui.menu .brand:before {
-    border-left: 2px solid #888888;
-}
-
-/* Editor menu toggle */
-#root:not(.hc) #editordropdown {
-    padding: 0 1em;
-}
-#root:not(.hc) #editordropdown #mainmenu #editordropdown.active:focus,
-    #root:not(.hc) #editordropdown.active {
-    background-color: @mainMenuBlocksJsToggleColor!important;
-}
-.menubar .ui.menu.fixed .item.editor-menuitem .ui.grid {
-    background: fade(@blue, 10%) !important;
-    border: 1px solid #888888;
-    border-radius: 0px !important;
-}
-.menubar .ui.menu.fixed .ui.item.editor-menuitem .item {
-    border-radius: 0px !important;
-}
-.menubar .ui.menu.fixed .ui.item.editor-menuitem .item.active {
-    color: white;
-}
-
-/* Blocks or JS active toggle color */
-.ui.item.editor-menuitem .active~.item.toggle {
-    background: @mainMenuBlocksJsToggleColor!important;
-}
-
-.menubar .ui.item.editor-menuitem .item.toggle {
-    height: 100%;
-}
-
+/* What is this? */
 .sandboxfooter a:not(.thin) {
-    color:white !important;
+    color: var(--pxt-neutral-background1) !important;
 }
 
-/* lowercase menu items */
-.menubar .ui.menu.fixed > .left.menu > .ui.item > .ui.text,
-    .menubar .ui.menu.fixed > .ui.item > span {
-    text-transform: lowercase;
+/* Lowercase menu items */
+// .menubar .ui.menu.fixed > .left.menu > .ui.item > .ui.text,
+//     .menubar .ui.menu.fixed > .ui.item > span {
+//     text-transform: lowercase;
+// }
+
+/* Modal close icon bg unset */
+/* Modal auto save disabled warning header is yellow fix it */
+body.pxt-theme-root .modal>.closeIcon {
+    background-color: unset !important;
 }
 
-#simulator .editor-sidebar {
-    background: @simulatorBackground data-uri("../docs/static/backgrounds/simulator.png") 0 0 repeat !important;
+/* Modal auto save disabled warning h3 fix inline block with icon use */
+.modal.auto-save-disabled-warning .header h3.header-title {
+    display: inline-block;
 }
 
-/* Editor download dialog */
-.ui.downloaddialog.modal>.content {
-    padding: 1rem;
-}
-.ui.downloaddialog.modal>.actions {
-    background-color: #FAFAFA;
+/* Download dialog left column */
+.modal.downloaddialog .download-hint {
+    background-color: var(--pxt-neutral-alpha10);
 }
 
-/* Tutorial */
-#tutorialcard .ui.tutorialsegment {
-    border-radius: 0;
+/* Common card label */
+.common-card-label {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: .5833em .833em;
+    vertical-align: baseline;
 }
+
+/* Card hover gray icon */
+.ui.cards .ui.card:hover i.grey.icon {
+    color: var(--pxt-neutral-alpha20) !important;
+}
+
+/* BlocklyDropDownContent legoColorPicker color none transparent bg and crossed out */
+.legoColorPicker .legoColorNone {
+     background-image:
+        linear-gradient(45deg, transparent 45%, red 45%, red 55%, transparent 55%),
+        conic-gradient(#dcdcdc 0% 25%, #f8f8f8 0% 50%, #dcdcdc 0% 75%, #f8f8f8 0%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+/* Block colorEnumPicker legoColorNone blocklyPath transparent pattern */
+.colorEnumPicker.legoColorNone .blocklyPath {
+    fill: url(#legoColorNonePattern) !important;
+}
+
 
 /* Mobile */
 @media only screen and (max-width: @largestMobileScreen) {
@@ -149,6 +536,7 @@
 
 /* Tablet */
 @media only screen and (min-width: @tabletBreakpoint) and (max-width: @largestTabletScreen) {
+
 }
 
 /* Small Monitor */
@@ -163,21 +551,22 @@
 
 /* >= Small Monitor (Small Monitor + Large Monitor + Wide Monitor) */
 @media only screen and (min-width: @computerBreakpoint) {
-    .fullscreensim #boardview {    
-        background: @simulatorBackground data-uri("../docs/static/backgrounds/simulator.png") 0 0 repeat !important;
-    }
+    
 }
+
 /* Mobile, Tablet AND thin screen */
 @media only screen and (max-width: @largestTabletScreen) and (max-height: @thinEditorBreakpoint) {
+    /* What is this? */
     .sandboxfooter a:not(.thin) {
         color: @black !important;
     }
 }
 
-/*******************************
-     Custom icons
-*******************************/
 
+
+/*******************************
+    Custom icons
+*******************************/
 .save-editortools-btn .icon.save:before {
     font-family: 'legoIcons';
     content: "\f118";
@@ -201,9 +590,4 @@
 .blocks-menuitem i.icon.blocks:before {
     font-family: 'legoIcons' !important;
     content: "\f119" !important;
-}
-
-.bluetooth {
-    background-color: #007EF4 !important;
-    color: white !important;
 }
