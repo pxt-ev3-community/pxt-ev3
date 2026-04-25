@@ -1,0 +1,117 @@
+name: Publish beta site
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout pxt-ev3
+        uses: actions/checkout@v4
+        with:
+          repository: pxt-ev3-community/pxt-ev3
+          fetch-depth: 0
+
+      - name: Update version in package.json
+        run: |
+          CLEAN_VERSION=$(git describe | sed 's/^v//')
+          sed -i "s/\"version\": \".*\"/\"version\": \"$CLEAN_VERSION\"/" package.json
+
+      - name: Checkout deploy tools
+        uses: actions/checkout@v4
+        with:
+          repository: pxt-ev3-community/pxt-ev3-community.github.io
+          path: github-deploy
+
+      - name: Checkout translations
+        uses: actions/checkout@v4
+        with:
+          repository: pxt-ev3-community/pxt-ev3-translations
+          path: translations
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install PXT globally
+        run: npm install -g pxt
+
+      - name: Install project dependencies
+        run: npm install --ignore-scripts
+
+      - name: Pin legacy deps
+        run: npm install @types/ws@8.5.4 --no-save
+
+      - name: Apply pxtarget.json overrides
+        run: |
+          mv pxtarget.json pxtarget-original.json
+          jq -s '.[0] * .[1]' pxtarget-original.json github-deploy/pxtarget-override.json > pxtarget.json
+
+      - name: Build static package
+        run: pxt staticpkg --locs-src translations --route pxt-ev3/beta
+
+      - name: Copy docs static assets into package
+        run: |
+          mkdir -p built/packaged/docs/static
+          if [ -d docs/static ]; then
+            cp -R docs/static/. built/packaged/pxt-ev3/beta/docs/static/
+            cd built/packaged/pxt-ev3/beta
+            ln -s docs/static static
+          fi
+
+      - name: Patch html json and manifest only
+        run: |
+          set -e
+          PKG="built/packaged"
+          find "$PKG" -type f \( -name '*.html' -o -name '*.json' -o -name '*.webmanifest' \) -print0 | while IFS= read -r -d '' f; do
+            sed -i 's#@cdnUrl@#/pxt-ev3/beta/#g' "$f" || true
+          done
+
+      - name: Debug packaged output
+        run: |
+          echo "=== remaining @cdnUrl@ in html/json/webmanifest ==="
+          find built/packaged -type f \( -name '*.html' -o -name '*.json' -o -name '*.webmanifest' \) -exec grep -nH '@cdnUrl@' {} \; || true
+          echo "=== docs/static files copied ==="
+          find built/packaged/docs/static -type f | sort | head -n 200 || true
+          echo "=== index.html references to docs/static ==="
+          grep -n 'docs/static' built/packaged/index.html || true
+
+      - name: Verify package output exists
+        run: |
+          test -d built/packaged
+          test -f built/packaged/pxt-ev3/beta/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: built/packaged/pxt-ev3
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
