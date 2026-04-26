@@ -67,7 +67,7 @@ jobs:
 
       - name: Copy docs static assets into package
         run: |
-          mkdir -p built/packaged/docs/static
+          mkdir -p built/packaged/pxt-ev3/beta/docs/static
           if [ -d docs/static ]; then
             cp -R docs/static/. built/packaged/pxt-ev3/beta/docs/static/
             cd built/packaged/pxt-ev3/beta
@@ -75,6 +75,10 @@ jobs:
             mkdir -p blob/4800c370dcc589501253dbfe7027df3b9f3ca883
             cd blob/4800c370dcc589501253dbfe7027df3b9f3ca883
             ln -s ../../docs/static static
+            cd ../../
+            mkdir -p pxt-ev3/beta/
+            cd pxt-ev3/beta/
+            ln -s ../../docs .
           fi
 
       - name: Patch html json and manifest only
