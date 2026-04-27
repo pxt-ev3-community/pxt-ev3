@@ -72,21 +72,21 @@ jobs:
             cp -R docs/static/. built/packaged/pxt-ev3/beta/docs/static/
             cd built/packaged/pxt-ev3/beta
             ln -s docs/static static
-            mkdir -p blob/4800c370dcc589501253dbfe7027df3b9f3ca883
-            cd blob/4800c370dcc589501253dbfe7027df3b9f3ca883
-            ln -s ../../docs/static static
-            cd ../../
-            mkdir -p pxt-ev3/beta/
-            cd pxt-ev3/beta/
-            ln -s ../../docs .
+            mkdir -p blob/4800c370dcc589501253dbfe7027df3b9f3ca883/static
+            cd blob/4800c370dcc589501253dbfe7027df3b9f3ca883/static
+            ln -s ../../../docs/static/icons icons
           fi
+
+      - name: Redirect /pxt-ev3/ to /pxt-ev3/beta/
+        run: |
+          cp github-deploy/extra-files/beta/index.html built/packaged/pxt-ev3/
 
       - name: Patch html json and manifest only
         run: |
           set -e
           PKG="built/packaged"
           find "$PKG" -type f \( -name '*.html' -o -name '*.json' -o -name '*.webmanifest' \) -print0 | while IFS= read -r -d '' f; do
-            sed -i 's#@cdnUrl@#/pxt-ev3/beta/#g' "$f" || true
+            sed -i 's#@cdnUrl@#/pxt-ev3/beta#g' "$f" || true
           done
 
       - name: Debug packaged output
