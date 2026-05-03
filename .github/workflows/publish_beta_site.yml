@@ -77,6 +77,15 @@ jobs:
             ln -s ../../../docs/static/icons icons
           fi
 
+      - name: Copy additional static files
+        run: |
+          cp -R github-deploy/extra-files/* built/packaged/pxt-ev3/beta/
+
+      - name: Add custom .js and .css overrides
+        run: |
+          sed -i '/<\/head>/e cat github-deploy/extra-files/ev3-community.html' built/packaged/pxt-ev3/beta/index.html
+          sed -i '/<\/head>/e cat github-deploy/extra-files/ev3-community.html' built/packaged/pxt-ev3/beta/docs.html
+
       - name: Redirect /pxt-ev3/ to /pxt-ev3/beta/
         run: |
           cp github-deploy/extra-files/beta/index.html built/packaged/pxt-ev3/
