@@ -56,3 +56,11 @@
 .menubar .ui.menu .brand:before {
     border-left: 2px solid var(--pxt-neutral-alpha40);
 }
+
+/* Search segment update */
+.projectsdialog .ui.inverted.grey.segment {
+    background-color: var(--pxt-neutral-background2) !important;
+    color: var(--pxt-neutral-foreground2) !important;
+    border: none;
+    box-shadow: none;
+}
