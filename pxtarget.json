@@ -222,7 +222,8 @@
         "python": true,
         "timeMachine": true,
         "timeMachineDiffInterval": 600000,
-        "timeMachineSnapshotInterval": 1800000
+        "timeMachineSnapshotInterval": 1800000,
+        "shareHomepageContent": true
     },
     "ignoreDocsErrors": true,
     "uploadDocs": true
