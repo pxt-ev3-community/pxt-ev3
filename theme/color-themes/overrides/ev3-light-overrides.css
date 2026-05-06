@@ -77,3 +77,8 @@
 .extensions-browser .tab-header {
     width: auto;
 }
+
+/* Extension import-btn margin disable */
+.extensions-browser .import-button .common-button {
+    margin: 0;
+}
