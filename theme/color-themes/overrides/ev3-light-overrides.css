@@ -72,3 +72,8 @@
     border: none;
     box-shadow: none;
 }
+
+/* Extension tab-header width fix */
+.extensions-browser .tab-header {
+    width: auto;
+}
