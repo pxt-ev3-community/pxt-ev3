@@ -28,10 +28,15 @@
     color: var(--pxt-colors-blue-foreground) !important;
 }
 
-/* Card label */
+/* Common card pxt-core fix beta label */
+.common-card {
+    overflow: initial;
+}
+/* Common card label */
 .common-card-label {
     background-color: var(--pxt-colors-orange-background);
     border-color: var(--pxt-colors-orange-hover);
+    right: -1.2rem;
 }
 
 /* Filemenu item hover */
