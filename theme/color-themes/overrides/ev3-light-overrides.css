@@ -73,6 +73,11 @@
     box-shadow: none;
 }
 
+/* Extension card */
+.extension-cards {
+    gap: 1.5rem;
+}
+
 /* Extension tab-header width fix */
 .extensions-browser .tab-header {
     width: auto;
