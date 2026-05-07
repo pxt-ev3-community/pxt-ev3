@@ -18,6 +18,9 @@
     color: var(--pxt-primary-foreground) !important;
     border: 1px solid var(--pxt-primary-background) !important;
 }
+.ui.button.positive:not(.disabled):hover {
+    filter: grayscale(.15) brightness(.85) contrast(1.3) !important;
+}
 
 /* Bluetooth button in download dialog */
 .ui.button.bluetooth {
@@ -25,10 +28,15 @@
     color: var(--pxt-colors-blue-foreground) !important;
 }
 
-/* Card label */
+/* Common card pxt-core fix beta label */
+.common-card {
+    overflow: initial;
+}
+/* Common card label */
 .common-card-label {
     background-color: var(--pxt-colors-orange-background);
     border-color: var(--pxt-colors-orange-hover);
+    right: -1.2rem;
 }
 
 /* Filemenu item hover */
@@ -63,4 +71,25 @@
     color: var(--pxt-neutral-foreground2) !important;
     border: none;
     box-shadow: none;
+}
+
+/* Extension card */
+.extension-cards {
+    gap: 1.5rem;
+}
+.common-card:has(.common-card-action):hover {
+    border: 1px solid var(--pxt-neutral-foreground1);
+}
+.common-extension-card img {
+    border-radius: .5rem .5rem 0 0;
+}
+
+/* Extension tab-header width fix */
+.extensions-browser .tab-header {
+    width: auto;
+}
+
+/* Extension import-btn margin disable */
+.extensions-browser .import-button .common-button {
+    margin: 0;
 }
