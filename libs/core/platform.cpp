@@ -186,6 +186,15 @@ void target_exit() {
     target_reset();
 }
 
+// stderr goes out to sensor port 1
+// Comment the below lines to enable debug messages out of this port.
+// Printing debug messages prevents normal functionality of port 1 UART sensors
+// such as the IR sensor.
+void close_stderr() __attribute__((constructor(101)));
+void close_stderr() {
+    fclose(stderr);
+}
+
 
 void target_startup() {
     stopLMS();
