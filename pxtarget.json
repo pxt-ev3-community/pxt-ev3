@@ -126,16 +126,12 @@
         ],
         "lightToc": true,
         "docMenu": [{
-                "name": "Support",
+                "name": "MakeCode forum",
                 "path": "https://forum.makecode.com/"
             },
             {
                 "name": "Troubleshoot",
                 "path": "https://makecode.mindstorms.com/troubleshoot"
-            },
-            {
-                "name": "Blocks",
-                "path": "/blocks"
             },
             {
                 "name": "JavaScript",
@@ -144,10 +140,6 @@
             {
                 "name": "Reference",
                 "path": "/reference"
-            },
-            {
-                "name": "FIRST LEGO League",
-                "path": "/fll"
             }
         ],
         "print": true,
