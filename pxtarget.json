@@ -126,6 +126,10 @@
         ],
         "lightToc": true,
         "docMenu": [{
+                "name": "PXT-EV3 GitHub Discussions",
+                "path": "https://github.com/orgs/pxt-ev3-community/discussions"
+            },
+            {
                 "name": "MakeCode forum",
                 "path": "https://forum.makecode.com/"
             },
