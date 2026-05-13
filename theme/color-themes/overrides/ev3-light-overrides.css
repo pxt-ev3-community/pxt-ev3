@@ -77,9 +77,6 @@
 .extension-cards {
     gap: 1.5rem;
 }
-.common-card:has(.common-card-action):hover {
-    border: 1px solid var(--pxt-neutral-foreground1);
-}
 .common-extension-card img {
     border-radius: .5rem .5rem 0 0;
 }
@@ -92,4 +89,9 @@
 /* Extension import-btn margin disable */
 .extensions-browser .import-button .common-button {
     margin: 0;
+}
+
+/* Set input:focus var pxt-focus-border */
+.ui.input input:focus  {
+    border-color: var(--pxt-focus-border) !important;
 }
