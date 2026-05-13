@@ -46,10 +46,9 @@
     background-color: var(--pxt-neutral-alpha10);
 }
 
-/* Project name input */
-.ui.input.projectname-input input {
-    box-shadow: none;
-    border: none !important;
+/* Project name input transparent border */
+#editortools #projectNameArea input {
+    border: 1px solid transparent;
 }
 
 /* Download button parrent background fix at simulator collapsed */
@@ -502,6 +501,22 @@ body.pxt-theme-root .modal>.closeIcon {
     line-height: 1;
     padding: .5833em .833em;
     vertical-align: baseline;
+}
+
+/* Json settings common-input fix */
+.pxt-json-settings .common-input-wrapper .common-input {
+    background: none transparent !important;
+    border: none !important;
+    color: var(--pxt-neutral-foreground2) !important;
+    min-width: 0;
+    outline: 0 !important;
+    padding: 0 .5rem !important;
+    text-overflow: ellipsis;
+    width: 100% !important;
+}
+/* Json settings common-input-group height */
+.pxt-json-settings .common-input-wrapper .common-input-group {
+    height: 2.5rem;
 }
 
 /* Card hover gray icon */
