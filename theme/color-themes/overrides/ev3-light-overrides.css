@@ -69,7 +69,6 @@
 .projectsdialog .ui.inverted.grey.segment {
     background-color: var(--pxt-neutral-background2) !important;
     color: var(--pxt-neutral-foreground2) !important;
-    border: none;
     box-shadow: none;
 }
 
