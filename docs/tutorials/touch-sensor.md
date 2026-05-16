@@ -17,7 +17,7 @@
   "imageUrl":"/static/tutorials/touch-sensor-values.png"
 }, {
   "name": "Stop At Object",
-  "description": "Waits for the sensor to be pressed before continuing the program",
+  "description": "Waits for the sensor to be pressed before continuing the program.",
   "cardType": "example",
   "url":"/tutorials/stop-at-object",
   "imageUrl":"/static/tutorials/pause-until-pressed.png"
