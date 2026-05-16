@@ -41,7 +41,7 @@
   "imageUrl":"/static/tutorials/coast-or-brake.png"
 }, {
   "name": "Turtle",
-  "description": "Encode moves and run them on a driving base",
+  "description": "Encode moves and run them on a driving base.",
   "cardType": "example",
   "url":"/tutorials/turtle",
   "imageUrl":"/static/tutorials/turtle.png"
