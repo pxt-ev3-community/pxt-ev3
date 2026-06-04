@@ -151,7 +151,10 @@
         "print": true,
         "showHomeScreen": true,
         "useTextLogo": true,
-        "homeScreenHero": "./static/hero.png",
+        "homeScreenHero": {
+            "imageUrl": "./static/hero.png",
+            "description": "BrickCode – A community fork of LEGO® MINDSTORMS® Education EV3 for MakeCode"
+        },
         "invertedMenu": true,
         "invertedMonaco": false,
         "monacoToolbox": true,
