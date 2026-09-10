@@ -1,6 +1,7 @@
 /// <reference path="./sensor.ts"/>
 
 namespace pxsim {
+    
     export enum InfraredRemoteButton {
         //% block="center beacon"
         CenterBeacon = 0x01,

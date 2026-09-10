@@ -160,6 +160,7 @@ namespace pxsim {
                     case DAL.DEVICE_TYPE_ULTRASONIC: this.inputNodes[port] = new UltrasonicSensorNode(port); break;
                     case DAL.DEVICE_TYPE_IR: this.inputNodes[port] = new InfraredSensorNode(port); break;
                     case DAL.DEVICE_TYPE_NXT_LIGHT: this.inputNodes[port] = new NXTLightSensorNode(port); break;
+                    case DAL.DEVICE_TYPE_NXT_TOUCH: this.inputNodes[port] = new NXTTouchSensorNode(port); break;
                 }
             }
             return this.inputNodes[port];

@@ -315,6 +315,8 @@ namespace pxsim.visuals {
                     view = new InfraredView(port); break;
                 case NodeType.NXTLightSensor:
                     view = new NXTLightSensorView(port); break;
+                case NodeType.NXTTouchSensor:
+                    view = new NXTTouchSensorView(port); break;
                 case NodeType.Brick:
                     //return new BrickView(0);
                     view = this.layoutView.getBrick(); break;

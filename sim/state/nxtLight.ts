@@ -11,7 +11,6 @@ namespace pxsim {
     }
 
     export class NXTLightSensorNode extends AnalogSensorNode {
-        
         id = NodeType.NXTLightSensor;
 
         private value: number = 0;

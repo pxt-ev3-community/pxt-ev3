@@ -1,5 +1,3 @@
-
-
 import lf = pxsim.localization.lf;
 
 namespace pxsim.motors {

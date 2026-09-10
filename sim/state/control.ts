@@ -1,6 +1,7 @@
 /// <reference path="../../libs/core/enums.d.ts"/>
 
 namespace pxsim.MMapMethods {
+    
     export interface MMapImpl {
         data?: Uint8Array;
         afterMemWrite?: () => void;
