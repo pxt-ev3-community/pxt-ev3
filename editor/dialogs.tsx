@@ -340,6 +340,7 @@ export async function showBluetoothConnectionStuckDialogAsync(): Promise<void> {
             <div>
                 <p>{lf("The Bluetooth connection could not be established.")}</p>
                 <p>{lf("This can happen if a previous Bluetooth connection is still active or if the Bluetooth connection is temporarily unavailable.")}</p>
+                <p>{lf("If other robotics software (such as EV3 Classroom or EV3 Lab) is open, close it to release the port.")}</p>
                 <p>{lf("Stop the program on the EV3 and try again. If the problem persists, turn Bluetooth off and on again, then try again.")}</p>
             </div>
         )

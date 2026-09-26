@@ -73,20 +73,33 @@ export class WebSerialIO implements pxt.packetio.PacketIO {
 
         this.state = IOState.Connecting;
 
-        try {
-            await this.port.open({ baudRate: 460800, bufferSize: 4096 });
-            this.state = IOState.Connected;
-            this.onConnectionChanged();
-            this.startReader();
-        } catch (e: any) {
-            this.state = IOState.Disconnected;
-            if (e?.name === "NetworkError") {
-                throw new Error("PORT_OPEN_FAILED");
+        // Try high speed first, then fall back to standard EV3 Bluetooth baud rates (115200, 57600)
+        const candidateBaudRates = [460800, 115200, 57600];
+        let lastError: any = null;
+
+        for (const baudRate of candidateBaudRates) {
+            try {
+                await this.port.open({ baudRate, bufferSize: 4096 });
+                this.state = IOState.Connected;
+                this.onConnectionChanged();
+                this.startReader();
+                return;
+            } catch (e: any) {
+                lastError = e;
+                if (e?.name === "SecurityError") {
+                    this.state = IOState.Disconnected;
+                    throw new Error("PORT_PERMISSION_DENIED");
+                }
+                console.warn(`SERIAL: Failed to open port at ${baudRate} baud, attempting fallback...`, e);
             }
-            if (e?.name === "SecurityError") {
-                throw new Error("PORT_PERMISSION_DENIED");
-            }
-            throw e;
+        }
+
+        this.state = IOState.Disconnected;
+        if (lastError?.name === "NetworkError") {
+            throw new Error("PORT_OPEN_FAILED");
+        }
+        if (lastError) {
+            throw lastError;
         }
     }
 
