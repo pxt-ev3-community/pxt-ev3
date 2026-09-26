@@ -506,4 +506,110 @@ namespace storage {
         storage.temporary.limit(fn, 65536);
     });
 
+    /**
+     * Easy storage of values to a file with name based on the project
+     * name.
+     */
+    class StoredValues {
+        data: { [key: string]: number } = {};
+        loaded: boolean = false;
+        private filename: string = "/home/root/lms2012/prjs/BrkProg_SAVE/" + control.programName() + ".rtf";
+        private previousSaveTime: number = 0;
+        private savePending: boolean = false;
+        private writeInterval: number = 5000;
+
+        constructor() {
+        }
+
+        /**
+         * Read stored values from file if it exists
+         */
+        readStoredValues() {
+            if (internal.exists(this.filename))
+            {
+                let lines = internal.read(this.filename).split("\n");
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    let sepPos = line.indexOf("=");
+
+                    if (sepPos > 0) {
+                        let key = line.substr(0, sepPos).trim();
+                        let val = parseInt(line.substr(sepPos + 1), 10);
+
+                        if (!isNaN(val)) {
+                            this.data[key] = val;
+                        }
+                    }
+                }
+            }
+            this.loaded = true;
+        }
+
+        /**
+         * Save stored values file
+         */
+        writeStoredValues() {
+            let timeNow = control.millis();
+
+            if (timeNow - this.previousSaveTime < this.writeInterval)
+            {
+                // Do not save too often to avoid flash wear
+                if (!this.savePending)
+                {
+                    this.savePending = true;
+                    setTimeout(() => {this.writeStoredValues()}, this.writeInterval);
+                }
+                return;
+            }
+
+            let fileData = "";
+            let keys = Object.keys(this.data);
+            for (let i = 0; i < keys.length; i++) {
+                fileData += keys[i] + "=" + this.data[keys[i]] + "\n";
+            }
+
+            internal.overwrite(this.filename, fileData);
+            this.savePending = false;
+            this.previousSaveTime = timeNow;
+        }
+    }
+
+    const storedvalues: StoredValues = new StoredValues();
+
+    /**
+     * Read a persistent variable
+     * @param key Name of the variable, eg: "name"
+     */
+    //% help=storage/read-value
+    //% blockId=storageReadValue
+    //% block="read value $key||or default $defaultValue"
+    //% weight=85
+    //% blockGap=8
+    //% inlineInputMode=inline
+    //% group="Stored Variables"
+    export function readValue(key: string, defaultValue: number = 0): number {
+        if (!storedvalues.loaded) storedvalues.readStoredValues();
+        let val = storedvalues.data[key];
+        return val === undefined ? defaultValue : val;
+    }
+
+    /**
+     * Write a persistent variable
+     * @param key Name of the variable, eg: "name"
+     * @param value Value to write
+     */
+    //% help=storage/write-value
+    //% blockId=storageWriteValue
+    //% block="write value $key = $value"
+    //% weight=85
+    //% blockGap=8
+    //% inlineInputMode=inline
+    //% group="Stored Variables"
+    export function writeValue(key: string, value: number = 0) {
+        if (!storedvalues.loaded) storedvalues.readStoredValues();
+        if (storedvalues.data[key] === value) return;
+
+        storedvalues.data[key] = value;
+        storedvalues.writeStoredValues();
+    }
 }
