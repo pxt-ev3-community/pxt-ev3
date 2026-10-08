@@ -8,13 +8,13 @@ namespace pxsim.visuals {
     export const CONTROL_TEXT_COLOR = '#000';
 
     export abstract class ControlView<T extends BaseNode> extends SimView<T> implements LayoutElement {
+
         protected content: SVGSVGElement;
 
         abstract getInnerView(parent: SVGSVGElement, globalDefs: SVGDefsElement): SVGElement;
 
         constructor(protected parent: SVGSVGElement, protected globalDefs: SVGDefsElement, protected state: T, protected port: number) {
             super(state);
-
         }
 
         getInnerWidth(): number {
@@ -73,6 +73,7 @@ namespace pxsim.visuals {
         }
 
         onComponentVisible() {
+            // Pass
         }
     }
 }

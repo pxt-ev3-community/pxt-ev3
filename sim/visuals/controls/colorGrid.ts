@@ -1,51 +1,66 @@
-
-
 namespace pxsim.visuals {
 
-    export class ColorGridControl extends ControlView<ColorSensorNode> {
-        private group: SVGGElement;
+    interface ColorGridItem {
+        id: string;
+        value: number;
+        fill: string;
+        stroke?: string;
+        opacity?: string;
+    }
 
-        private static colorIds = ['red', 'yellow', 'blue', 'green', 'black', 'brown', 'white', 'none'];
-        private static colorValue = [5, 4, 2, 3, 1, 7, 6, 0];
+    const COLOR_ITEMS: ColorGridItem[] = [
+        { id: 'red', value: 5, fill: '#f12a21' },
+        { id: 'yellow', value: 4, fill: '#ffd01b' },
+        { id: 'blue', value: 2, fill: '#006db3' },
+        { id: 'green', value: 3, fill: '#00934b' },
+        { id: 'black', value: 1, fill: '#000' },
+        { id: 'brown', value: 7, fill: '#6c2d00' },
+        { id: 'white', value: 6, fill: '#fff', stroke: '#94989b' },
+        { id: 'none', value: 0, fill: '#fff', stroke: '#94989b', opacity: '0%' }
+    ];
+
+    export class ColorGridControl extends ControlView<ColorSensorNode> {
+        
+        private group: SVGGElement;
 
         private colorDivs: Element[] = [];
 
         getInnerView() {
             this.group = svg.elt("g") as SVGGElement;
-            this.group.setAttribute("transform", `translate(2, 2.5) scale(0.6)`)
-
-            const colors = ['#f12a21', '#ffd01b', '#006db3', '#00934b', '#000', '#6c2d00'];
-            const colorIds = ['red', 'yellow', 'blue', 'green', 'black', 'brown'];
+            this.group.setAttribute("transform", `translate(2, 2.5) scale(0.6)`);
+            this.colorDivs = [];
 
             let cy = -4;
-            for (let c = 0; c < colorIds.length; c++) {
+            for (let c = 0; c < COLOR_ITEMS.length; c++) {
+                const item = COLOR_ITEMS[c];
                 const cx = c % 2 == 0 ? 2.2 : 7.5;
                 if (c % 2 == 0) cy += 5;
-                if (colorIds[c]) {
-                    const circle = pxsim.svg.child(this.group, "circle", { 
-                        'class': `sim-color-grid-circle sim-color-grid-${colorIds[c]}`,
-                        'cx': cx, 'cy': cy, 'r': '2', 'style': `fill: ${colors[c]}` });
-                    this.colorDivs.push(circle);
-                    pointerEvents.down.forEach(evid => circle.addEventListener(evid, ev => {
-                        this.setColor(ColorGridControl.colorValue[c]);
-                    }));
-                }
-            }
+                
+                const circleWrapper = pxsim.svg.child(this.group, "g");
+                const style = `fill: ${item.fill};` + (item.opacity ? ` fill-opacity: ${item.opacity};` : "");
 
-            const whiteCircleWrapper = pxsim.svg.child(this.group, "g", { 'id': 'white-cirlce-wrapper' });
-            const noneCircleWrapper = pxsim.svg.child(this.group, "g", { 'id': 'nothing-circle-wrapper' });
-            const whiteCircle = pxsim.svg.child(whiteCircleWrapper, "circle", { 'class': 'sim-color-grid-circle sim-color-grid-white', 'cx': 2.2, 'cy': '16', 'r': '2', 'style': `fill: #fff` });
-            const noneCircle = pxsim.svg.child(noneCircleWrapper, "circle", { 'class': 'sim-color-grid-circle sim-color-grid-none', 'cx': 7.5, 'cy': '16', 'r': '2', 'style': `fill: #fff; fill-opacity: 0%;` });
-            this.colorDivs.push(whiteCircle);
-            this.colorDivs.push(noneCircle);
-            pxsim.svg.child(whiteCircleWrapper, "circle", { 'cx': 2.2, 'cy': '16', 'r': '2', 'style': `fill: none; stroke: #94989b; stroke-width: 0.1px` });
-            pxsim.svg.child(noneCircleWrapper, "circle", { 'cx': 7.5, 'cy': '16', 'r': '2', 'style': `fill: none; stroke: #94989b; stroke-width: 0.1px` });
-            pointerEvents.down.forEach(evid => whiteCircleWrapper.addEventListener(evid, ev => {
-                this.setColor(6);
-            }));
-            pointerEvents.down.forEach(evid => noneCircleWrapper.addEventListener(evid, ev => {
-                this.setColor(0);
-            }));
+                const circle = pxsim.svg.child(circleWrapper, "circle", {
+                    'class': `sim-color-grid-circle sim-color-grid-${item.id}`,
+                    'cx': cx,
+                    'cy': cy,
+                    'r': 2,
+                    'style': style
+                });
+                this.colorDivs.push(circle);
+
+                if (item.stroke) {
+                    pxsim.svg.child(circleWrapper, "circle", {
+                        'cx': cx,
+                        'cy': cy,
+                        'r': 2,
+                        'style': `fill: none; stroke: ${item.stroke}; stroke-width: 0.1px`
+                    });
+                }
+
+                pointerEvents.down.forEach(evid => circleWrapper.addEventListener(evid, () => {
+                    this.setColor(item.value);
+                }));
+            }
             return this.group;
         }
 
@@ -58,18 +73,14 @@ namespace pxsim.visuals {
         }
 
         public updateState() {
-            if (!this.visible) {
-                return;
-            }
+            if (!this.visible) return;
+
             const node = this.state;
             const color = node.getValue();
 
-            for (let c = 0; c < ColorGridControl.colorValue.length; c++) {
-                const colorId = ColorGridControl.colorIds[c];
-                const colorValue = ColorGridControl.colorValue[c];
+            for (let c = 0; c < COLOR_ITEMS.length; c++) {
                 const colorDiv = this.colorDivs[c] as HTMLElement;
-
-                if (colorValue == color) {
+                if (COLOR_ITEMS[c].value === color) {
                     pxsim.U.addClass(colorDiv, 'sim-color-selected');
                 } else {
                     pxsim.U.removeClass(colorDiv, 'sim-color-selected');
@@ -78,13 +89,8 @@ namespace pxsim.visuals {
         }
 
         private setColor(color: number) {
-            const state = this.state;
-            const currentColor = state.getValue();
-            if (currentColor == color) {
-                state.setColor(0);
-            } else {
-                state.setColor(color);
-            }
+            const currentColor = this.state.getValue();
+            this.state.setColor(currentColor === color ? 0 : color);
         }
     }
 }

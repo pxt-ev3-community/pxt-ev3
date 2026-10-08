@@ -1,41 +1,57 @@
-
-
 namespace pxsim.visuals {
 
+    const SLIDER_RADIUS = 100;
+
     export class MotorSliderControl extends ControlView<MotorNode> {
+        
         private group: SVGGElement;
         private gradient: SVGLinearGradientElement;
         private slider: SVGGElement;
-
         private reporter: SVGTextElement;
-
         private dial: SVGGElement;
-
-        private static SLIDER_RADIUS = 100;
-
+        
         private internalAngle: number = 0;
+        private lastPosition: number;
+        private prevVal: number;
 
         getInnerView(parent: SVGSVGElement, globalDefs: SVGDefsElement) {
             this.group = svg.elt("g") as SVGGElement;
 
-            const slider = pxsim.svg.child(this.group, 'g', { 'transform': 'translate(25,25)' })
+            const slider = pxsim.svg.child(this.group, 'g', { 'transform': 'translate(25, 25)' });
             const outerCircle = pxsim.svg.child(slider, "circle", {
-                'stroke-dasharray': '565.48', 'stroke-dashoffset': '0',
-                'cx': 100, 'cy': 100, 'r': '90', 'style': `fill:transparent;`,
-                'stroke': '#a8aaa8', 'stroke-width': '1rem'
+                'stroke-dasharray': 565.48, 
+                'stroke-dashoffset': 0,
+                'cx': 100, 
+                'cy': 100, 
+                'r': 90, 
+                'style': `fill: transparent`,
+                'stroke': '#a8aaa8', 
+                'stroke-width': '1rem'
             }) as SVGCircleElement;
 
             this.reporter = pxsim.svg.child(this.group, "text", {
-                'x': this.getInnerWidth() / 2, 'y': this.getInnerHeight() / 2,
-                'text-anchor': 'middle', 'dominant-baseline': 'middle',
+                'x': this.getInnerWidth() / 2, 
+                'y': this.getInnerHeight() / 2,
+                'text-anchor': 'middle', 
+                'dominant-baseline': 'middle',
                 'style': 'font-size: 50px',
                 'class': 'sim-text inverted number'
             }) as SVGTextElement;
 
             this.dial = pxsim.svg.child(slider, "g", { 'cursor': '-webkit-grab' }) as SVGGElement;
             const handleInner = pxsim.svg.child(this.dial, "g");
-            pxsim.svg.child(handleInner, "circle", { 'cx': 0, 'cy': 0, 'r': 30, 'style': 'fill: #f12a21;' });
-            pxsim.svg.child(handleInner, "circle", { 'cx': 0, 'cy': 0, 'r': 29.5, 'style': 'fill: none;stroke: #b32e29' });
+            pxsim.svg.child(handleInner, "circle", { 
+                'cx': 0, 
+                'cy': 0, 
+                'r': 30, 
+                'style': 'fill: #f12a21' 
+            });
+            pxsim.svg.child(handleInner, "circle", { 
+                'cx': 0, 
+                'cy': 0, 
+                'r': 29.5, 
+                'style': 'fill: none; stroke: #b32e29' 
+            });
 
             this.updateDial();
 
@@ -66,7 +82,7 @@ namespace pxsim.visuals {
             }, () => {
                 captured = false;
                 this.handleSliderUp();
-            })
+            });
 
             return this.group;
         }
@@ -78,9 +94,7 @@ namespace pxsim.visuals {
         getInnerHeight() {
             return 250;
         }
-
-        private lastPosition: number;
-        private prevVal: number;
+        
         private updateSliderValue(pt: SVGPoint, parent: SVGSVGElement, ev: MouseEvent) {
             let cur = svg.cursorPoint(pt, parent, ev);
             let bBox = this.content.getBoundingClientRect();
@@ -89,7 +103,7 @@ namespace pxsim.visuals {
                 x: cur.x / this.scaleFactor - bBox.left / this.scaleFactor,
                 y: cur.y / this.scaleFactor - bBox.top / this.scaleFactor
             };
-            const radius = MotorSliderControl.SLIDER_RADIUS / 2;
+            const radius = SLIDER_RADIUS / 2;
             const dx = coords.x - radius;
             const dy = coords.y - radius;
             const atan = Math.atan(-dy / dx);
@@ -135,7 +149,7 @@ namespace pxsim.visuals {
             let angle = this.internalAngle;
 
             // Update dial position
-            const radius = MotorSliderControl.SLIDER_RADIUS;
+            const radius = SLIDER_RADIUS;
             const dialRadius = 5;
             const x = Math.ceil((radius - dialRadius) * Math.sin(angle * Math.PI / 180)) + radius;
             const y = Math.ceil((radius - dialRadius) * -Math.cos(angle * Math.PI / 180)) + radius;
@@ -143,9 +157,8 @@ namespace pxsim.visuals {
         }
 
         updateState() {
-            if (!this.visible) {
-                return;
-            }
+            if (!this.visible) return;
+            
             const node = this.state;
             const angle = node.getAngle() % 360;
 

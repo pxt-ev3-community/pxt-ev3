@@ -1,7 +1,9 @@
 /// <reference path="./moduleView.ts" />
 
 namespace pxsim.visuals {
+
     export class NXTTouchSensorView extends ModuleView implements LayoutElement {
+        
         private shadowElement: SVGElement | undefined;
 
         constructor(port: number) {

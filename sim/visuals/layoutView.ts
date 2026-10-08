@@ -3,6 +3,7 @@
 /// <reference path="./nodes/portView.ts" />
 
 namespace pxsim.visuals {
+
     export const BRICK_HEIGHT_RATIO = 1 / 3;
     export const MODULE_AND_WIRING_HEIGHT_RATIO = 1 / 3; // For inputs and outputs
 
@@ -24,6 +25,7 @@ namespace pxsim.visuals {
     }
 
     export class LayoutView extends ViewContainer {
+        
         private inputs: LayoutElement[] = [];
         private outputs: LayoutElement[] = [];
 

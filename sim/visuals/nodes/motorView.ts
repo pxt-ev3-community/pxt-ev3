@@ -1,6 +1,7 @@
 /// <reference path="./moduleView.ts" />
 
 namespace pxsim.visuals {
+
     export abstract class MotorView extends ModuleView implements LayoutElement {
 
         protected motorLabelGroup: SVGGElement;
@@ -28,7 +29,6 @@ namespace pxsim.visuals {
         }
 
         protected abstract renderMotorAngle(holeEl: Element, angle: number): void;
-
 
         getWiringRatio() {
             return 0.37;

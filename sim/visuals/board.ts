@@ -99,6 +99,7 @@ namespace pxsim.visuals {
     const EV3_HEIGHT = 151.66585;
     export const SCREEN_WIDTH = 178;
     export const SCREEN_HEIGHT = 128;
+    
     export interface IBoardTheme {
         accent?: string;
         highContrast?: boolean;
@@ -140,6 +141,7 @@ namespace pxsim.visuals {
     }
 
     export class EV3View implements BoardView {
+        
         public static BOARD_WIDTH = 500;
         public static BOARD_HEIGHT = 500;
 
@@ -275,6 +277,13 @@ namespace pxsim.visuals {
                     }
                     break;
                 }
+                case NodeType.NXTSoundSensor: {
+                    const state = ev3board().getInputNodes()[port] as NXTSoundSensorNode;
+                    if (state.getMode() != NXTSoundSensorMode.None) {
+                        view = new SoundLevelControl(this.element, this.defs, state, port);
+                    }
+                    break;
+                }
                 case NodeType.MediumMotor:
                 case NodeType.LargeMotor: {
                     const state = ev3board().getMotors()[port];
@@ -313,10 +322,12 @@ namespace pxsim.visuals {
                     view = new UltrasonicSensorView(port); break;
                 case NodeType.InfraredSensor:
                     view = new InfraredView(port); break;
-                case NodeType.NXTLightSensor:
-                    view = new NXTLightSensorView(port); break;
                 case NodeType.NXTTouchSensor:
                     view = new NXTTouchSensorView(port); break;
+                case NodeType.NXTLightSensor:
+                    view = new NXTLightSensorView(port); break;
+                case NodeType.NXTSoundSensor:
+                    view = new NXTSoundSensorView(port); break;
                 case NodeType.Brick:
                     //return new BrickView(0);
                     view = this.layoutView.getBrick(); break;

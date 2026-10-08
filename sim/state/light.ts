@@ -1,6 +1,7 @@
 namespace pxsim {
 
     export class EV3LightState {
+        
         lightPattern: number;
 
         constructor() {

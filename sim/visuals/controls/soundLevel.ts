@@ -1,9 +1,9 @@
 namespace pxsim.visuals {
 
-    export class LightWheelControl extends ControlView<NXTLightSensorNode> {
+    export class SoundLevelControl extends ControlView<NXTSoundSensorNode> {
 
         private group: SVGGElement;
-        private lightGradient: SVGLinearGradientElement;
+        private soundGradient: SVGLinearGradientElement;
         private reporter: SVGTextElement;
         private rect: SVGElement;
 
@@ -27,19 +27,19 @@ namespace pxsim.visuals {
             return 131;
         }
 
-        private getMinValue(state: NXTLightSensorNode) {
-            if (state.getMode() == NXTLightSensorMode.ReflectedLight) return state.brightReflectedLight;
-            else if (state.getMode() == NXTLightSensorMode.AmbientLight) return state.brightAmbientLight;
+        private getMinValue(state: NXTSoundSensorNode) {
+            if (state.getMode() == NXTSoundSensorMode.Db) return state.loudDb;
+            else if (state.getMode() == NXTSoundSensorMode.DbA) return state.loudDbA;
             return 0;
         }
 
-        private getMaxValue(state: NXTLightSensorNode) {
-            if (state.getMode() == NXTLightSensorMode.ReflectedLightRaw || state.getMode() == NXTLightSensorMode.AmbientLightRaw) {
+        private getMaxValue(state: NXTSoundSensorNode) {
+            if (state.getMode() == NXTSoundSensorMode.RawDb || state.getMode() == NXTSoundSensorMode.RawDbA) {
                 return 4095;
-            } else if (state.getMode() == NXTLightSensorMode.ReflectedLight) {
-                return state.darkReflectedLight;
-            } else if (state.getMode() == NXTLightSensorMode.AmbientLight) {
-                return state.darkAmbientLight;
+            } else if (state.getMode() == NXTSoundSensorMode.Db) {
+                return state.silentDb;
+            } else if (state.getMode() == NXTSoundSensorMode.DbA) {
+                return state.silentDbA;
             }
             return 100;
         }
@@ -50,31 +50,31 @@ namespace pxsim.visuals {
             const node = this.state;
             const value = node.getValue();
             let inverseValue = this.getMaxValue(node) - value + this.getMinValue(node);
-            if (node.getMode() == NXTLightSensorMode.ReflectedLightRaw || node.getMode() == NXTLightSensorMode.AmbientLightRaw) {
+            if (node.getMode() == NXTSoundSensorMode.RawDb || node.getMode() == NXTSoundSensorMode.RawDbA) {
                 inverseValue = pxsim.math.map(inverseValue, 0, 4095, 0, 100);
                 inverseValue = pxsim.math.clamp(0, 100, inverseValue);
-            } else if (node.getMode() == NXTLightSensorMode.ReflectedLight) {
-                inverseValue = pxsim.math.map(inverseValue, node.darkReflectedLight, node.brightReflectedLight, 0, 100);
-                inverseValue = pxsim.math.clamp(0, 100, inverseValue);
-            } else if (node.getMode() == NXTLightSensorMode.AmbientLight) {
-                inverseValue = pxsim.math.map(inverseValue, node.darkAmbientLight, node.brightAmbientLight, 0, 100);
-                inverseValue = pxsim.math.clamp(0, 100, inverseValue);
-            }
-            svg.setGradientValue(this.lightGradient, inverseValue + "%");
-            if (node.getMode() == NXTLightSensorMode.ReflectedLightRaw || node.getMode() == NXTLightSensorMode.AmbientLightRaw) {
+                svg.setGradientValue(this.soundGradient, inverseValue + "%");
                 this.reporter.textContent = `${Math.floor(parseFloat(value.toString()))}`;
-            } else {
+            } else if (node.getMode() == NXTSoundSensorMode.Db) {
+                inverseValue = pxsim.math.map(inverseValue, node.silentDb, node.loudDb, 0, 100);
+                inverseValue = pxsim.math.clamp(0, 100, inverseValue);
+                svg.setGradientValue(this.soundGradient, inverseValue + "%");
+                this.reporter.textContent = `${Math.floor(pxsim.math.map(parseFloat(value.toString()), this.getMaxValue(node), this.getMinValue(node), 0, 100))}%`;
+            } else if (node.getMode() == NXTSoundSensorMode.DbA) {
+                inverseValue = pxsim.math.map(inverseValue, node.silentDbA, node.loudDbA, 0, 100);
+                inverseValue = pxsim.math.clamp(0, 100, inverseValue);
+                svg.setGradientValue(this.soundGradient, inverseValue + "%");
                 this.reporter.textContent = `${Math.floor(pxsim.math.map(parseFloat(value.toString()), this.getMaxValue(node), this.getMinValue(node), 0, 100))}%`;
             }
         }
 
-        updateLightLevel(pt: SVGPoint, parent: SVGSVGElement, ev: MouseEvent) {
+        updateSoundLevel(pt: SVGPoint, parent: SVGSVGElement, ev: MouseEvent) {
             const state = this.state;
             let cur = svg.cursorPoint(pt, parent, ev);
             const bBox = this.rect.getBoundingClientRect();
             const height = bBox.height;
             let t = Math.max(0, Math.min(1, (height + bBox.top / this.scaleFactor - cur.y / this.scaleFactor) / height));
-            if (state.getMode() == NXTLightSensorMode.ReflectedLight || state.getMode() == NXTLightSensorMode.AmbientLight) {
+            if (state.getMode() == NXTSoundSensorMode.Db || state.getMode() == NXTSoundSensorMode.DbA) {
                 t = 1 - t;
             }
             state.setValue(this.getMinValue(state) + t * (this.getMaxValue(state) - this.getMinValue(state)));
@@ -83,18 +83,18 @@ namespace pxsim.visuals {
         getInnerView(parent: SVGSVGElement, globalDefs: SVGDefsElement) {
             this.group = svg.elt("g") as SVGGElement;
 
-            let gc = "gradient-light-" + this.getPort();
-            const prevLightGradient = globalDefs.querySelector(`#${gc}`) as SVGLinearGradientElement;
-            this.lightGradient = prevLightGradient ? prevLightGradient : svg.linearGradient(globalDefs, gc, false);
-            svg.setGradientValue(this.lightGradient, "50%");
-            svg.setGradientColors(this.lightGradient, "black", "yellow");
+            let gc = "gradient-sound-" + this.getPort();
+            const prevSoundGradient = globalDefs.querySelector(`#${gc}`) as SVGLinearGradientElement;
+            this.soundGradient = prevSoundGradient ? prevSoundGradient : svg.linearGradient(globalDefs, gc, false);
+            svg.setGradientValue(this.soundGradient, "50%");
+            svg.setGradientColors(this.soundGradient, "#1e293b", "#06b6d4");
 
             const reporterGroup = pxsim.svg.child(this.group, "g");
             reporterGroup.setAttribute("transform", `translate(${this.getWidth() / 2}, 20)`);
-            this.reporter = pxsim.svg.child(reporterGroup, "text", { 
-                'text-anchor': 'middle', 
-                'x': 0, 
-                'y': 0, 
+            this.reporter = pxsim.svg.child(reporterGroup, "text", {
+                'text-anchor': 'middle',
+                'x': 0,
+                'y': 0,
                 'class': 'sim-text number large inverted'
             }) as SVGTextElement;
 
@@ -113,13 +113,13 @@ namespace pxsim.visuals {
             touchEvents(rect, ev => {
                 if (captured && (ev as MouseEvent).clientY) {
                     ev.preventDefault();
-                    this.updateLightLevel(pt, parent, ev as MouseEvent);
+                    this.updateSoundLevel(pt, parent, ev as MouseEvent);
                 }
             }, ev => {
                 captured = true;
                 if ((ev as MouseEvent).clientY) {
                     rect.setAttribute('cursor', '-webkit-grabbing');
-                    this.updateLightLevel(pt, parent, ev as MouseEvent);
+                    this.updateSoundLevel(pt, parent, ev as MouseEvent);
                 }
             }, () => {
                 captured = false;

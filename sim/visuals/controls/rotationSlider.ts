@@ -1,36 +1,51 @@
-
-
 namespace pxsim.visuals {
+
     const MAX_RATE = 40;
 
+    const SLIDER_WIDTH = 70;
+    // const SLIDER_HEIGHT = 78;
+
     export class RotationSliderControl extends ControlView<GyroSensorNode> {
+        
         private group: SVGGElement;
         private slider: SVGGElement;
         private rateText: SVGTextElement;
-
-        private static SLIDER_WIDTH = 70;
-        //private static SLIDER_HEIGHT = 78;
 
         getInnerView(parent: SVGSVGElement, globalDefs: SVGDefsElement) {
             this.group = svg.elt("g") as SVGGElement;
 
             const sliderGroup = pxsim.svg.child(this.group, "g");
-            sliderGroup.setAttribute("transform", `translate(10,0)`);
+            sliderGroup.setAttribute("transform", `translate(10, 0)`);
 
             const rotationLine = pxsim.svg.child(sliderGroup, "g");
-            pxsim.svg.child(rotationLine, "path", { 'transform': 'translate(7.11 -31.1)', 'd': 'M68.71,99.5l6.1-8S61.3,79.91,42.69,78.35,12,83.14,6.49,85.63a48.69,48.69,0,0,0-9.6,5.89L3.16,99.3S19.27,87.7,37.51,87.94,68.71,99.5,68.71,99.5Z', 'style': 'fill: #626262' });
+            pxsim.svg.child(rotationLine, "path", { 
+                'transform': 'translate(7.11 -31.1)', 
+                'd': 'M68.71,99.5l6.1-8S61.3,79.91,42.69,78.35,12,83.14,6.49,85.63a48.69,48.69,0,0,0-9.6,5.89L3.16,99.3S19.27,87.7,37.51,87.94,68.71,99.5,68.71,99.5Z', 
+                'style': 'fill: #626262' 
+            });
 
             this.slider = pxsim.svg.child(sliderGroup, "g") as SVGGElement;
             const handleInner = pxsim.svg.child(sliderGroup, "g");
-            pxsim.svg.child(this.slider, "circle", { 'cx': 9, 'cy': 50, 'r': 13, 'style': 'fill: #f12a21' });
-            pxsim.svg.child(this.slider, "circle", { 'cx': 9, 'cy': 50, 'r': 12.5, 'style': 'fill: none;stroke: #b32e29' });
+            pxsim.svg.child(this.slider, "circle", { 
+                'cx': 9, 
+                'cy': 50, 
+                'r': 13, 
+                'style': 'fill: #f12a21' 
+            });
+            pxsim.svg.child(this.slider, "circle", { 
+                'cx': 9, 
+                'cy': 50, 
+                'r': 12.5, 
+                'style': 'fill: none; stroke: #b32e29' 
+            });
 
             this.rateText = pxsim.svg.child(this.group, "text", {
-                'x': this.getInnerWidth() / 2,
-                'y': RotationSliderControl.SLIDER_WIDTH * 1.2,
-                'text-anchor': 'middle', 'dominant-baseline': 'middle',
-                'style': 'font-size: 16px',
-                'class': 'sim-text inverted number'
+                'x': this.getInnerWidth() / 2, 
+                'y': SLIDER_WIDTH * 1.2, 
+                'text-anchor': 'middle', 
+                'dominant-baseline': 'middle', 
+                'style': 'font-size: 16px', 
+                'class': 'sim-text inverted number' 
             }) as SVGTextElement;
 
             const dragSurface = svg.child(this.group, "rect", {
@@ -57,13 +72,13 @@ namespace pxsim.visuals {
                 }
             }, () => {
                 captured = false;
-            })
+            });
 
             return this.group;
         }
 
         getInnerWidth() {
-            return RotationSliderControl.SLIDER_WIDTH * 1.5;
+            return SLIDER_WIDTH * 1.5;
         }
 
         updateState() {
@@ -75,7 +90,7 @@ namespace pxsim.visuals {
             this.rateText.textContent = `${rate}°/s`
             // cap rate at 40deg/s
             const percentage = 50 + Math.sign(rate) * Math.min(MAX_RATE, Math.abs(rate)) / MAX_RATE * 50;
-            const x = RotationSliderControl.SLIDER_WIDTH * percentage / 100;
+            const x = SLIDER_WIDTH * percentage / 100;
             const y = Math.abs((percentage - 50) / 50) * 10;
             this.slider.setAttribute("transform", `translate(${x}, ${y})`);
         }
@@ -84,12 +99,9 @@ namespace pxsim.visuals {
             let cur = svg.cursorPoint(pt, parent, ev);
             const width = CONTROL_WIDTH; //DistanceSliderControl.SLIDER_HEIGHT;
             const bBox = this.content.getBoundingClientRect();
-            let t = Math.max(0, Math.min(1, (width + bBox.left / this.scaleFactor - cur.x / this.scaleFactor) / width))
-
+            let t = Math.max(0, Math.min(1, (width + bBox.left / this.scaleFactor - cur.x / this.scaleFactor) / width));
             t = -(t - 0.5) * 2; // [-1,1]
-
-            const state = this.state;
-            state.setRate(MAX_RATE * t);
+            this.state.setRate(MAX_RATE * t);
         }
     }
 

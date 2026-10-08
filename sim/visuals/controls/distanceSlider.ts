@@ -1,18 +1,15 @@
-
-
 namespace pxsim.visuals {
 
+    const SLIDER_HANDLE_HEIGHT = 26;
+    const SLIDER_SIDE_PADDING = 6;
+
     export class DistanceSliderControl extends ControlView<UltrasonicSensorNode> {
+        
         private group: SVGGElement;
         private gradient: SVGLinearGradientElement;
         private slider: SVGGElement;
-
-        private rect: SVGRectElement;
-
         private reporter: SVGTextElement;
-
-        private static SLIDER_HANDLE_HEIGHT = 26;
-        private static SLIDER_SIDE_PADDING = 6;
+        private rect: SVGRectElement;
 
         getInnerWidth() {
             return 111;
@@ -39,15 +36,13 @@ namespace pxsim.visuals {
         }
 
         updateState() {
-            if (!this.visible) {
-                return;
-            }
+            if (!this.visible) return;
+
             const node = this.state;
             const percentage = node.getValue() / 10; /* convert back to cm */
             const y = this.getSliderHeight() * percentage / this.getMaxValue();
-            this.slider.setAttribute("transform", `translate(0, ${y - DistanceSliderControl.SLIDER_HANDLE_HEIGHT / 2})`);
-            // Update reporter text
-            this.reporter.textContent = `${parseFloat((percentage).toString()).toFixed(0)}cm`;
+            this.slider.setAttribute("transform", `translate(0, ${y - SLIDER_HANDLE_HEIGHT / 2})`);
+            this.reporter.textContent = `${parseFloat((percentage).toString()).toFixed(0)}cm`; // Update reporter text
         }
 
         updateSliderValue(pt: SVGPoint, parent: SVGSVGElement, ev: MouseEvent) {
@@ -77,18 +72,43 @@ namespace pxsim.visuals {
 
             const reporterGroup = pxsim.svg.child(this.group, "g");
             reporterGroup.setAttribute("transform", `translate(${this.getWidth() / 2}, 20)`);
-            this.reporter = pxsim.svg.child(reporterGroup, "text", { 'text-anchor': 'middle', 'x': 0, 'y': '0', 'class': 'sim-text number large inverted' }) as SVGTextElement;
+            this.reporter = pxsim.svg.child(reporterGroup, "text", { 
+                'text-anchor': 'middle', 
+                'x': 0, 
+                'y': 0, 
+                'class': 'sim-text number large inverted' 
+            }) as SVGTextElement;
 
             const sliderGroup = pxsim.svg.child(this.group, "g");
             sliderGroup.setAttribute("transform", `translate(${this.getInnerWidth() / 2 - this.getSliderWidth() / 2}, ${this.getReporterHeight()})`)
 
-            const rect = pxsim.svg.child(sliderGroup, "rect", { 'x': DistanceSliderControl.SLIDER_SIDE_PADDING, 'y': 2, 'width': this.getSliderWidth() - DistanceSliderControl.SLIDER_SIDE_PADDING * 2, 'height': this.getSliderHeight(), 'style': `fill: url(#${gid})` });
+            const rect = pxsim.svg.child(sliderGroup, "rect", { 
+                'x': SLIDER_SIDE_PADDING, 
+                'y': 2, 
+                'width': this.getSliderWidth() - SLIDER_SIDE_PADDING * 2, 
+                'height': this.getSliderHeight(), 
+                'style': `fill: url(#${gid})` 
+            });
             this.rect = rect as SVGRectElement;
 
-            this.slider = pxsim.svg.child(sliderGroup, "g", { "transform": "translate(0,0)" }) as SVGGElement;
+            this.slider = pxsim.svg.child(sliderGroup, "g", { "transform": "translate(0, 0)" }) as SVGGElement;
             const sliderInner = pxsim.svg.child(this.slider, "g");
-            pxsim.svg.child(sliderInner, "rect", { 'width': this.getSliderWidth(), 'height': DistanceSliderControl.SLIDER_HANDLE_HEIGHT, 'rx': '2', 'ry': '2', 'style': 'fill: #f12a21' });
-            pxsim.svg.child(sliderInner, "rect", { 'x': '0.5', 'y': '0.5', 'width': this.getSliderWidth() - 1, 'height': DistanceSliderControl.SLIDER_HANDLE_HEIGHT - 1, 'rx': '1.5', 'ry': '1.5', 'style': 'fill: none;stroke: #b32e29' });
+            pxsim.svg.child(sliderInner, "rect", { 
+                'width': this.getSliderWidth(), 
+                'height': SLIDER_HANDLE_HEIGHT, 
+                'rx': 2, 
+                'ry': 2, 
+                'style': 'fill: #f12a21' 
+            });
+            pxsim.svg.child(sliderInner, "rect", { 
+                'x': 0.5, 
+                'y': 0.5, 
+                'width': this.getSliderWidth() - 1, 
+                'height': SLIDER_HANDLE_HEIGHT - 1, 
+                'rx': 1.5, 
+                'ry': 1.5, 
+                'style': 'fill: none; stroke: #b32e29' 
+            });
 
             const dragSurface = svg.child(this.group, "rect", {
                 x: 0,
@@ -116,7 +136,7 @@ namespace pxsim.visuals {
             }, () => {
                 captured = false;
                 dragSurface.setAttribute('cursor', '-webkit-grab');
-            })
+            });
 
             return this.group;
         }
@@ -130,5 +150,4 @@ namespace pxsim.visuals {
             };
         }
     }
-
 }

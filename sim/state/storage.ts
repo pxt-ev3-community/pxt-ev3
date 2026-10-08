@@ -1,4 +1,5 @@
 namespace pxsim.storage {
+
     // Virtual file system for the browser simulator (Filename -> Content string)
     export let virtualFS: { [filename: string]: string } = {};
 
@@ -65,11 +66,10 @@ namespace pxsim.storage {
             }
         };
     }
-
 }
 
-
 namespace pxsim.MMapMethods {
+    
     // Keep a reference to the original registry object
     const originalRegistry = mmapRegistry;
 

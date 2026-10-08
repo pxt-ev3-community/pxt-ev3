@@ -32,9 +32,9 @@ namespace sensors {
          */
         //% help=sensors/nxt-touch-sensor/on-event
         //% block="on **nxt touch sensor** %this|%event"
-        //% blockId=nxtTouchSensorOnEvent
+        //% blockId="nxtTouchSensorOnEvent"
         //% parts="nxt-touch-sensor"
-        //% blockNamespace=sensors
+        //% blockNamespace="sensors"
         //% this.fieldEditor="images"
         //% this.fieldOptions.columns="4"
         //% this.fieldOptions.width="300"
@@ -52,9 +52,9 @@ namespace sensors {
          */
         //% help=sensors/nxt-touch-sensor/pause-until
         //% block="pause until **nxt touch sensor** %this|%event"
-        //% blockId=nxtTouchSensorPauseUntil
+        //% blockId="nxtTouchSensorPauseUntil"
         //% parts="nxt-touch-sensor"
-        //% blockNamespace=sensors
+        //% blockNamespace="sensors"
         //% this.fieldEditor="images"
         //% this.fieldOptions.columns="4"
         //% this.fieldOptions.width="300"
@@ -71,9 +71,9 @@ namespace sensors {
          */
         //% help=sensors/nxt-touch-sensor/is-pressed
         //% block="**nxt touch sensor** %this|is pressed"
-        //% blockId=nxtTouchSensorIsPressed
+        //% blockId="nxtTouchSensorIsPressed"
         //% parts="nxt-touch-sensor"
-        //% blockNamespace=sensors
+        //% blockNamespace="sensors"
         //% this.fieldEditor="images"
         //% this.fieldOptions.columns="4"
         //% this.fieldOptions.width="300"
@@ -91,16 +91,16 @@ namespace sensors {
          */
         //% help=sensors/nxt-touch-sensor/was-pressed
         //% block="**nxt touch sensor** %this|was pressed"
-        //% blockId=nxtTouchSensorWasPressed
-        //% blockHidden=true
+        //% blockId="nxtTouchSensorWasPressed"
         //% parts="nxt-touch-sensor"
-        //% blockNamespace=sensors
+        //% blockNamespace="sensors"
         //% this.fieldEditor="images"
         //% this.fieldOptions.columns="4"
         //% this.fieldOptions.width="300"
         //% weight=80
         //% subcategory="NXT"
         //% group="Touch Sensor"
+        //% blockHidden=true
         wasPressed() {
             this.poke();
             return this.button.wasPressed();

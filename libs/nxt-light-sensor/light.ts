@@ -40,7 +40,7 @@ namespace sensors {
         }
 
         _query() {
-            const rawValue = this._readRaw();
+            const rawValue = this._readPin1();
             switch (this.mode) {
                 case NXTLightSensorMode.ReflectedLight:
                     return [this._normalize(rawValue, this.darkReflectedLight, this.brightReflectedLight)];
@@ -148,11 +148,6 @@ namespace sensors {
         // Enables or disables the built-in illumination LED
         private _setLedState(enable: boolean) {
             this._writeDcm(enable ? dcmLedOn : dcmLedOff);
-        }
-
-        // Gets the raw light value
-        private _readRaw() {
-            return this._readPin1();
         }
         
         // Normalizes the raw light value to a percentage based on the dark and bright reference values

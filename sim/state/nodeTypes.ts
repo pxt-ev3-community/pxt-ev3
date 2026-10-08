@@ -1,4 +1,5 @@
 namespace pxsim {
+
     export enum NodeType {
         Port = 0,
         Brick = 1,
@@ -9,8 +10,25 @@ namespace pxsim {
         ColorSensor = 6,
         UltrasonicSensor = 7,
         InfraredSensor = 8,
-        NXTLightSensor = 9,
-        NXTTouchSensor = 10
+        NXTTouchSensor = 9,
+        NXTLightSensor = 10,
+        NXTSoundSensor = 11,
+        NXTColorSensor = 12,
+        NXTUltrasonicSensor = 13
+    }
+
+    export enum DeviceFamily {
+        EV3,
+        NXT,
+        // HiTechnic,
+        // Mindsensors
+    }
+
+    export enum DeviceInterface {
+        Analog,
+        Uart,
+        I2C,
+        None
     }
 
     export interface Node {
@@ -19,6 +37,7 @@ namespace pxsim {
     }
 
     export class BaseNode implements Node {
+
         public id: number;
         public port: number;
         public isOutput = false;
@@ -45,7 +64,7 @@ namespace pxsim {
          * @param elapsed
          */
         updateState(elapsed: number) {
-
+            // Pass
         }
     }
 }

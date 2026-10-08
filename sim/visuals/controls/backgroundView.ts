@@ -1,20 +1,19 @@
-
-
 namespace pxsim.visuals {
 
     export class BackgroundViewControl extends ControlView<PortNode> {
+
         private backgroundGroup: SVGGElement;
         private backgroundRect: SVGRectElement;
 
         getInnerView() {
             this.backgroundGroup = svg.elt("g") as SVGGElement;
-            this.backgroundRect = pxsim.svg.child(this.backgroundGroup,
-                "rect", {
-                    'x': 0, 'y': 0,
-                    'width': '100%',
-                    'height': '100%',
-                    'style': `fill: ${this.theme.backgroundViewColor};stroke: #A8A9A8; stroke-width: 3px; stroke-opacity: 0.2`
-                }) as SVGRectElement;
+            this.backgroundRect = pxsim.svg.child(this.backgroundGroup, "rect", {
+                'x': 0, 
+                'y': 0,
+                'width': '100%',
+                'height': '100%',
+                'style': `fill: ${this.theme.backgroundViewColor}; stroke: #A8A9A8; stroke-width: 3px; stroke-opacity: 0.2`
+            }) as SVGRectElement;
             return this.backgroundGroup;
         }
 
@@ -38,5 +37,4 @@ namespace pxsim.visuals {
             return 173.86;
         }
     }
-
 }

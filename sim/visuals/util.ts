@@ -1,4 +1,5 @@
 namespace pxsim.visuals {
+    
     export interface LinearGradientDefinition {
         stops: LinearGradientStop[];
     }
@@ -13,8 +14,7 @@ namespace pxsim.visuals {
     export function touchEvents(e: SVGElement | SVGElement[], move?: TouchCallback, down?: TouchCallback, up?: TouchCallback) {
         if (Array.isArray(e)) {
             e.forEach(el => bindEvents(el, move, down, up));
-        }
-        else {
+        } else {
             bindEvents(e, move, down, up);
         }
     }
@@ -83,8 +83,7 @@ namespace pxsim.visuals {
 
         if ((window as any).PointerEvent) {
             if (downEvent) e.addEventListener("pointerdown", downEvent);
-        }
-        else {
+        } else {
             if (downEvent) e.addEventListener("mousedown", downEvent);
 
             if (pxsim.svg.isTouchEnabled()) {
@@ -102,8 +101,7 @@ namespace pxsim.visuals {
 
             if (typeof stop.offset === "number") {
                 offset = stop.offset + "%"
-            }
-            else {
+            } else {
                 offset = stop.offset as string;
             }
 
@@ -121,8 +119,7 @@ namespace pxsim.visuals {
                 const stop = opts.stops[i];
                 e.setAttribute("offset", offsetString(stop.offset));
                 e.setAttribute("stop-color", stop.color);
-            }
-            else {
+            } else {
                 gradient.removeChild(e);
             }
             j = i + 1;

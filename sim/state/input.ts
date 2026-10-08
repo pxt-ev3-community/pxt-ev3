@@ -1,6 +1,7 @@
 import lf = pxsim.localization.lf;
 
 namespace pxsim.motors {
+    
     function portsToString(out: number): string {
         let r = "";
         for (let i = 0; i < DAL.NUM_OUTPUTS; ++i) {

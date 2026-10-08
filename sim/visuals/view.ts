@@ -1,5 +1,7 @@
 namespace pxsim.visuals {
+
     export abstract class View {
+
         protected element: SVGGElement;
         protected rendered = false;
         protected visible = false;
@@ -237,6 +239,7 @@ namespace pxsim.visuals {
     }
 
     export abstract class SimView<T extends BaseNode> extends View implements LayoutElement {
+
         constructor(protected state: T) {
             super();
         }
@@ -268,6 +271,7 @@ namespace pxsim.visuals {
     }
 
     export class ViewContainer extends View {
+        
         public getInnerWidth() {
             return 0;
         }

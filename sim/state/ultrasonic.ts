@@ -1,7 +1,9 @@
 /// <reference path="./sensor.ts"/>
 
 namespace pxsim {
+    
     export class UltrasonicSensorNode extends UartSensorNode {
+
         id = NodeType.UltrasonicSensor;
 
         private distance: number = 127; // in cm

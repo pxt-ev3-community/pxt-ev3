@@ -1,6 +1,7 @@
 /// <reference path="./moduleView.ts" />
 
 namespace pxsim.visuals {
+    
     export class TouchSensorView extends ModuleView implements LayoutElement {
 
         private static RECT_ID = ["touch_gradient4", "touch_gradient3", "touch_gradient2", "touch_gradient1"];

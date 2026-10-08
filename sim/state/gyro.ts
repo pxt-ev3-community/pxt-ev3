@@ -7,6 +7,7 @@ namespace pxsim {
     }
 
     export class GyroSensorNode extends UartSensorNode {
+        
         id = NodeType.GyroSensor;
 
         private rate: number = 0;

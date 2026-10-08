@@ -16,6 +16,7 @@ namespace pxsim {
     }    
 
     export class RemoteState {
+
         state: number = 0;
 
         constructor() {
@@ -52,6 +53,7 @@ namespace pxsim {
     }
 
     export class InfraredSensorNode extends UartSensorNode {
+        
         id = NodeType.InfraredSensor;
 
         private proximity: number = 50; // [0..100]

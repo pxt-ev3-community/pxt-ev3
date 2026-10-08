@@ -3,6 +3,7 @@
 namespace pxsim.visuals {
 
     export class WireView extends View implements LayoutElement {
+        
         private wire: SVGSVGElement;
         private path: SVGPathElement;
         private hasDimensions: boolean;

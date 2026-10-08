@@ -1,4 +1,5 @@
 namespace pxsim.visuals {
+
     export function normalizeId(prefix: string, svgId: string) {
         return `${prefix}-${svgId}`;
     }
@@ -17,6 +18,7 @@ namespace pxsim.visuals {
     }
 
     export class ModuleView extends View implements LayoutElement {
+
         protected content: SVGSVGElement;
 
         protected controlShown: boolean;
@@ -57,23 +59,22 @@ namespace pxsim.visuals {
             this.buildDomCore();
             if (pxsim.inLightMode()) this.optimizeForLightMode();
             this.attachEvents();
-            if (this.hasClick())
+            if (this.hasClick()) {
                 this.content.style.cursor = "pointer";
+            }
             return this.content;
         }
 
         protected buildDomCore() {
-
+            // Pass
         }
 
         protected optimizeForLightMode() {
-            
+            // Pass
         }
 
         public getInnerHeight() {
-            if (!this.content) {
-                return 0;
-            }
+            if (!this.content) return 0;
             if (!this.content.hasAttribute("viewBox")) {
                 return this.getContentHeight();
             }
@@ -81,9 +82,7 @@ namespace pxsim.visuals {
         }
 
         public getInnerWidth() {
-            if (!this.content) {
-                return 0;
-            }
+            if (!this.content) return 0;
             if (!this.content.hasAttribute("viewBox")) {
                 return this.getContentWidth();
             }
@@ -91,20 +90,17 @@ namespace pxsim.visuals {
         }
 
         public getContentHeight() {
-            if (!this.content) {
-                return 0;
-            }
+            if (!this.content) return 0;
             return parseFloat(this.content.getAttribute("height"));
         }
     
         public getContentWidth() {
-            if (!this.content) {
-                return 0;
-            }
+            if (!this.content) return 0;
             return parseFloat(this.content.getAttribute("width"));
         }
 
         public attachEvents() {
+            // Pass
         }
 
         public resize(width: number, height: number, strict?: boolean) {

@@ -1,6 +1,7 @@
 /// <reference path="./sensorView.ts" />
 
 namespace pxsim.visuals {
+    
     export class GyroSensorView extends SensorView implements LayoutElement {
 
         constructor(port: number) {

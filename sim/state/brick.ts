@@ -3,6 +3,7 @@
 namespace pxsim {
 
     export class PortNode extends BaseNode {
+        
         id = NodeType.Port;
 
         constructor(port: number) {
@@ -12,6 +13,7 @@ namespace pxsim {
 
 
     export class BrickNode extends BaseNode {
+
         id = NodeType.Brick;
 
         buttonState: EV3ButtonState;

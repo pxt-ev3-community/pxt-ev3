@@ -5,6 +5,7 @@
 namespace pxsim {
 
     export class EV3Board extends CoreBoard {
+        
         viewHost: visuals.BoardHost;
         view: SVGSVGElement;
 
@@ -15,9 +16,9 @@ namespace pxsim {
         screenState: ScreenState;
         audioState: AudioState;
         remoteState: RemoteState;
-
-        inputNodes: SensorNode[] = [];
+        
         brickNode: BrickNode;
+        inputNodes: SensorNode[] = [];
         outputNodes: MotorNode[] = [];
 
         highcontrastMode?: boolean;
@@ -159,8 +160,9 @@ namespace pxsim {
                     case DAL.DEVICE_TYPE_TOUCH: this.inputNodes[port] = new TouchSensorNode(port); break;
                     case DAL.DEVICE_TYPE_ULTRASONIC: this.inputNodes[port] = new UltrasonicSensorNode(port); break;
                     case DAL.DEVICE_TYPE_IR: this.inputNodes[port] = new InfraredSensorNode(port); break;
-                    case DAL.DEVICE_TYPE_NXT_LIGHT: this.inputNodes[port] = new NXTLightSensorNode(port); break;
                     case DAL.DEVICE_TYPE_NXT_TOUCH: this.inputNodes[port] = new NXTTouchSensorNode(port); break;
+                    case DAL.DEVICE_TYPE_NXT_LIGHT: this.inputNodes[port] = new NXTLightSensorNode(port); break;
+                    case DAL.DEVICE_TYPE_NXT_SOUND: this.inputNodes[port] = new NXTSoundSensorNode(port); break;
                 }
             }
             return this.inputNodes[port];

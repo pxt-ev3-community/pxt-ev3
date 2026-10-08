@@ -1,8 +1,9 @@
 /// <reference path="./sensorView.ts" />
 
 namespace pxsim.visuals {
-    export class NXTLightSensorView extends SensorView implements LayoutElement {
 
+    export class NXTLightSensorView extends SensorView implements LayoutElement {
+        
         constructor(port: number) {
             super(NXT_LIGHT_SENSOR_SVG, "nxt-light-sensor", NodeType.NXTLightSensor, port);
         }

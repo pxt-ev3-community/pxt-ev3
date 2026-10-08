@@ -1,7 +1,9 @@
 namespace pxsim {
+
     const MIN_RAMP_SPEED = 3;
 
     export class MotorNode extends BaseNode {
+
         isOutput = true;
         private rotationsPerMilliSecond: number;
 
@@ -44,8 +46,9 @@ namespace pxsim {
 
         setSpeedCmd(cmd: DAL, values: number[]) {
             if (this.speedCmd != cmd ||
-                JSON.stringify(this.speedCmdValues) != JSON.stringify(values))
+                JSON.stringify(this.speedCmdValues) != JSON.stringify(values)) {
                 this.setChangedState();
+            }
             // new command TODO: values
             this.speedCmd = cmd;
             this.speedCmdValues = values;
@@ -154,10 +157,9 @@ namespace pxsim {
                             this.speed = speed * dstep / step1;
                             // ensure non-zero speed
                             this.speed = Math.max(MIN_RAMP_SPEED, Math.ceil(Math.abs(this.speed))) * Math.sign(speed);
-                        }
-                        else if (dstep < step1 + step2) // run
+                        } else if (dstep < step1 + step2) { // run
                             this.speed = speed;
-                        else if (step2 && dstep < step1 + step2 + step3) {
+                        } else if (step2 && dstep < step1 + step2 + step3) {
                             this.speed = speed * (step1 + step2 + step3 - dstep)
                                 / (step1 + step2 + step3) + 5;
                             // ensure non-zero speed
@@ -185,18 +187,16 @@ namespace pxsim {
                         const turnRatio = this.speedCmdValues[1];
                         // if turnratio is negative, right motor at power level
                         // right motor -> this.port > otherMotor.port
-                        if (Math.sign(this.port - otherMotor.port)
-                            == Math.sign(turnRatio))
-                            break; // handled in other motor code
+                        if (Math.sign(this.port - otherMotor.port) == Math.sign(turnRatio)) break; // handled in other motor code
                         const stepsOrTime = this.speedCmdValues[2];
                         const brake = this.speedCmdValues[3];
                         const dstep = this.speedCmd == DAL.opOutputTimeSync
                             ? pxsim.U.now() - this.speedCmdTime
                             : this.tacho - this.speedCmdTacho;
                         // 0 is special case, run infinite
-                        if (!stepsOrTime || dstep < stepsOrTime)
+                        if (!stepsOrTime || dstep < stepsOrTime) {
                             this.speed = speed;
-                        else {
+                        } else {
                             if (brake) this.speed = 0;
                             this.clearSpeedCmd();
                         }
@@ -210,13 +210,13 @@ namespace pxsim {
                         otherMotor.speed = Math.max(-100, Math.min(100, otherMotor.speed >> 0));;
 
                         // stop other motor if needed
-                        if (!this._synchedMotor)
+                        if (!this._synchedMotor) {
                             otherMotor.clearSpeedCmd();
+                        }
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 // the user is holding the handle - so position is the angle
                 this.speed = 0;
                 // rotate by the desired angle change
@@ -245,6 +245,7 @@ namespace pxsim {
 }
 
 namespace pxsim {
+    
     // A re-implementation of Math.sign (since IE11 doesn't support it)
     export function sign(num: number) {
         return num ? num < 0 ? -1 : 1 : 0;

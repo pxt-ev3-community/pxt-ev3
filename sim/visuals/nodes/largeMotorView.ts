@@ -2,6 +2,7 @@
 /// <reference path="./motorView.ts" />
 
 namespace pxsim.visuals {
+    
     export class LargeMotorView extends MotorView implements LayoutElement {
 
         constructor(port: number) {

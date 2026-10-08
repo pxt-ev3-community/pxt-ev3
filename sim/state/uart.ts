@@ -38,7 +38,6 @@ namespace pxsim {
         TST_UART_WRITE = 0xc048740a,
     }
 
-
     export enum DevConOff {
         Connection = 0, // int8[4]
         Type = 4, // int8[4]
@@ -88,10 +87,10 @@ namespace pxsim {
                     const inputNodes = ev3board().getInputNodes();
                     for (let port = 0; port < DAL.NUM_INPUTS; port++) {
                         const node = inputNodes[port];
-                        if (node && node.isUart()) {
+                        if (node && node.getInterface() === DeviceInterface.Uart) {
                             // Actual
                             const index = 0; //UartOff.Actual + port * 2;
-                            if (!node.isModeReturnArr()) {
+                            if (!node.returnsArray()) {
                                 const value = Math.round(node.getValue());
                                 util.map16Bit(data, UartOff.Raw + DAL.MAX_DEVICE_DATALENGTH * 300 * port + DAL.MAX_DEVICE_DATALENGTH * index, value);
                             } else {
@@ -107,8 +106,9 @@ namespace pxsim {
                 },
                 read: buf => {
                     let v = "vSIM";
-                    // for (let i = 0; i < buf.data.length; ++i)
+                    // for (let i = 0; i < buf.data.length; ++i) {
                     //     buf.data[i] = v.charCodeAt(i) || 0
+                    // }
                     return buf.data.length;
                 },
                 write: buf => {
