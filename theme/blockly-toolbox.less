@@ -11,8 +11,9 @@
     src: data-uri("../docs/static/fonts/icons/iconfont.woff");
 }
 
+// Include 'brand-icons' so toolbox categories can render brand glyphs (e.g. Bluetooth)
 span.blocklyTreeIcon {
-    font-family: 'legoIcons', 'Icons' !important;
+    font-family: 'legoIcons', 'Icons', 'brand-icons' !important;
     font-size: 1.2rem !important;
 }
 
@@ -75,4 +76,9 @@ span.blocklyTreeLabel {
 span.blocklyTreeIcon.blocklyTreeIconfunctions {
     font-family: 'legoIcons', 'Icons' !important;
     font-size: 1.2rem !important;
+}
+
+// Compensate lower baseline of 'brand-icons' by shifting glyph 2px up inside span
+span.blocklyTreeIcon.blocklyTreeIconbluetooth {
+    line-height: 41px !important;
 }
