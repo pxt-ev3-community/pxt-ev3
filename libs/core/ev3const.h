@@ -86,4 +86,9 @@
 #define BUTTON_ID_LEFT 0x10
 #define BUTTON_ID_ESCAPE 0x20
 
+// Bluetooth constants (used by platform.cpp and bluetooth.cpp)
+#define EV3_AF_BLUETOOTH    31   // AF_BLUETOOTH on EV3 Linux
+#define EV3_BTPROTO_RFCOMM  3    // BTPROTO_RFCOMM
+#define VM_BRICK_NAME_SIZE  120  // max length of EV3 brick name
+
 #endif
