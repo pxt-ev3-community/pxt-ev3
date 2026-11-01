@@ -1,6 +1,6 @@
 {
   "name": "pxt-ev3",
-  "version": "1.5.9",
+  "version": "1.6.0",
   "description": "LEGO MINDSTORMS EV3 for Microsoft MakeCode",
   "private": false,
   "keywords": [
@@ -49,12 +49,12 @@
     "pxt-core": "13.2.13"
   },
   "overrides": {
-      "@blockly/field-grid-dropdown": {
-          "blockly": "13.1.1"
-      },
-      "@blockly/plugin-workspace-search": {
-          "blockly": "13.1.1"
-      }
+    "@blockly/field-grid-dropdown": {
+      "blockly": "13.1.1"
+    },
+    "@blockly/plugin-workspace-search": {
+      "blockly": "13.1.1"
+    }
   },
   "scripts": {
     "test": "node node_modules/pxt-core/built/pxt.js travis"
