@@ -47,3 +47,10 @@ do sed -i '/<\/head>/e cat static-files/ev3-community.html' $file
 done
 
 
+# Load the external tutorial redirect early in the page.
+for file in "$OUTDIR"/*.html; do
+    sed -i \
+      "0,/<head>/s#<head>#<head><script src=\"$URL/ghtutorial-redirect.js\"></script>#" \
+      "$file"
+done
+
