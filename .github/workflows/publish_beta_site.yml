@@ -45,28 +45,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Version supplied by the repository.
+          # Fallback version from package.json
           FALLBACK_VERSION=$(node -p "require('./package.json').version")
 
-          # Only use a release tag pointing to this exact commit.
-          GIT_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || true)
-          TAG_VERSION="${GIT_TAG#v}"
+          # Try to get version with build number from git describe (e.g. v1.5.9-302-g02d2b0a)
+          GIT_DESCRIBE=$(git describe --tags 2>/dev/null || true)
+          CLEAN_VERSION="${GIT_DESCRIBE#v}"
 
-          if [[ "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            VERSION="$TAG_VERSION"
-            echo "Using release tag: $GIT_TAG"
-          else
+          # Check if git describe gave a valid semver version
+          if [ -n "$CLEAN_VERSION" ] && node -e "const s = require('semver'); if (!s.valid('$CLEAN_VERSION')) process.exit(1);" 2>/dev/null; then
+            VERSION="$CLEAN_VERSION"
+            echo "Using git describe version: $VERSION"
+          elif node -e "const s = require('semver'); if (!s.valid('$FALLBACK_VERSION')) process.exit(1);" 2>/dev/null; then
             VERSION="$FALLBACK_VERSION"
-            echo "No valid release tag; using package.json: $VERSION"
-          fi
-
-          # Never allow an empty or invalid version.
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Invalid target version: '$VERSION'"
+            echo "No valid git tag; fallback to package.json: $VERSION"
+          else
+            echo "::error::Could not resolve a valid SemVer target version!"
             exit 1
           fi
 
-          # Update the package for the PXT build.
+          # Update the package for the PXT build
           npm pkg set "version=$VERSION"
 
           echo "Target version: $(node -p "require('./package.json').version")"
