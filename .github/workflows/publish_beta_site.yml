@@ -25,11 +25,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Update version in package.json
-        run: |
-          CLEAN_VERSION=$(git describe --tags | sed 's/^v//')
-          sed -i "s/\"version\": \".*\"/\"version\": \"$CLEAN_VERSION\"/" package.json
-
       - name: Checkout translations
         uses: actions/checkout@v4
         with:
@@ -44,6 +39,38 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      
+      - name: Resolve and validate target version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Version supplied by the repository.
+          FALLBACK_VERSION=$(node -p "require('./package.json').version")
+
+          # Only use a release tag pointing to this exact commit.
+          GIT_TAG=$(git describe --tags --exact-match HEAD 2>/dev/null || true)
+          TAG_VERSION="${GIT_TAG#v}"
+
+          if [[ "$TAG_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            VERSION="$TAG_VERSION"
+            echo "Using release tag: $GIT_TAG"
+          else
+            VERSION="$FALLBACK_VERSION"
+            echo "No valid release tag; using package.json: $VERSION"
+          fi
+
+          # Never allow an empty or invalid version.
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid target version: '$VERSION'"
+            exit 1
+          fi
+
+          # Update the package for the PXT build.
+          npm pkg set "version=$VERSION"
+
+          echo "Target version: $(node -p "require('./package.json').version")"
+          echo "Source commit: $(git rev-parse HEAD)"
 
       - name: Install PXT globally
         run: npm install -g pxt
