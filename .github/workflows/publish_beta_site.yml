@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '.github/workflows/**'
+      - 'README.md'
   workflow_dispatch:
 
 permissions:
@@ -47,21 +50,23 @@ jobs:
 
           SEMVER_REGEX="^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$"
 
-          # Fallback version from package.json
-          FALLBACK_VERSION=$(node -p "require('./package.json').version")
+          # Base version always comes from package.json
+          BASE_VERSION=$(node -p "require('./package.json').version")
 
-          # Try to get version with build number from git describe (e.g. v1.5.9-303-gcc88ae5)
-          GIT_DESCRIBE=$(git describe --tags 2>/dev/null || true)
-          CLEAN_VERSION="${GIT_DESCRIBE#v}"
+          # Find the last commit on master that modified package.json and count commits since then
+          LAST_BUMP_COMMIT=$(git log -n 1 --format="%H" --first-parent -m -- package.json 2>/dev/null || true)
+          COMMITS_COUNT=$(git rev-list --count "${LAST_BUMP_COMMIT}..HEAD" 2>/dev/null || echo 0)
 
-          if [[ "$CLEAN_VERSION" =~ $SEMVER_REGEX ]]; then
-            VERSION="$CLEAN_VERSION"
-            echo "Using git describe version: $VERSION"
-          elif [[ "$FALLBACK_VERSION" =~ $SEMVER_REGEX ]]; then
-            VERSION="$FALLBACK_VERSION"
-            echo "No valid git tag; fallback to package.json: $VERSION"
+          if [ "$COMMITS_COUNT" -eq 0 ]; then
+            VERSION="$BASE_VERSION"
+            echo "Bump or release commit detected; using clean version: $VERSION"
           else
-            echo "::error::Could not resolve a valid SemVer target version!"
+            VERSION="${BASE_VERSION}-${COMMITS_COUNT}"
+            echo "No bump in current commit; using version: $VERSION"
+          fi
+
+          if [[ ! "$VERSION" =~ $SEMVER_REGEX ]]; then
+            echo "::error::Generated version '$VERSION' does not match SemVer format!"
             exit 1
           fi
 
