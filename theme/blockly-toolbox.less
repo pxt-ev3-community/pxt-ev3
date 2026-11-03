@@ -11,8 +11,9 @@
     src: data-uri("../docs/static/fonts/icons/iconfont.woff");
 }
 
+// Include 'brand-icons' so toolbox categories can render brand glyphs (e.g. Bluetooth)
 span.blocklyTreeIcon {
-    font-family: 'legoIcons', 'Icons' !important;
+    font-family: 'legoIcons', 'Icons', 'brand-icons' !important;
     font-size: 1.2rem !important;
 }
 
@@ -75,4 +76,16 @@ span.blocklyTreeLabel {
 span.blocklyTreeIcon.blocklyTreeIconfunctions {
     font-family: 'legoIcons', 'Icons' !important;
     font-size: 1.2rem !important;
+}
+
+// Compensate lower baseline of fallback icon fonts ('Icons' / 'brand-icons') by shifting glyph 2px up inside span
+span.blocklyTreeIcon.blocklyTreeIconbluetooth,
+span.blocklyTreeIcon.blocklyTreeIconbroadcast,
+span.blocklyTreeIcon.blocklyTreeIconstorage {
+    line-height: 41px !important;
+}
+
+// 'basic' (grid icon \uf00a) has higher top padding in the font glyph and needs an additional 2px shift up
+span.blocklyTreeIcon.blocklyTreeIconbasic {
+    line-height: 37px !important;
 }
