@@ -1,0 +1,18 @@
+{
+    "name": "bluetooth",
+    "description": "Bluetooth brick-to-brick messaging for EV3 using Mailbox --beta",
+    "files": [
+        "README.md",
+        "bluetooth.cpp",
+        "bluetooth.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "weight": 75,
+    "searchOnly": false,
+    "public": true,
+    "dependencies": {
+        "core": "file:../core"
+    }
+}

@@ -21,7 +21,8 @@
         "libs/screen",
         "libs/ev3",
         "libs/storage",
-        "libs/broadcast"
+        "libs/broadcast",
+        "libs/bluetooth"
     ],
     "simulator": {
         "autoRun": true,

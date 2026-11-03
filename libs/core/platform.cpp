@@ -23,10 +23,6 @@ namespace pxt {
 #define RFCOMM_PING 3
 #define RFCOMM_STOP 2
 
-#define EV3_AF_BLUETOOTH 31
-
-#define VM_BRICK_NAME_SIZE 120
-
 int lmsPid;
 static pthread_t mainThreadId; // Main JavaScript user execution thread ID
 
