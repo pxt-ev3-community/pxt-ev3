@@ -9,6 +9,7 @@ It supports:
 * External storage
 * Text files
 * CSV files
+* Easy name-value storage of numbers
 
 ## Storage locations
 
@@ -70,6 +71,15 @@ Example:
 
 ```blocks
 storage.external.append("data.rtf", "Hello")
+```
+
+### Name-value storage
+
+Named values are stored in internal memory in a file based on project name.
+Format is simple:
+
+```text
+name=123
 ```
 
 ## File formats
