@@ -382,7 +382,7 @@ namespace brick {
     }
 
     /**
-     * Returns the width or height of an image
+     * Returns the width or height of an image.
      * @param picture The image to get the width or height of
      * @param dimension The dimension to get
      */
