@@ -53,9 +53,13 @@ jobs:
           # Base version always comes from package.json
           BASE_VERSION=$(node -p "require('./package.json').version")
 
-          # Find the last commit on master that modified package.json and count commits since then
-          LAST_BUMP_COMMIT=$(git log -n 1 --format="%H" --first-parent -m -- package.json 2>/dev/null || true)
-          COMMITS_COUNT=$(git rev-list --count "${LAST_BUMP_COMMIT}..HEAD" 2>/dev/null || echo 0)
+          # Count commits since the release tag or the last commit that modified the "version": field in package.json
+          if git rev-parse "v${BASE_VERSION}" >/dev/null 2>&1; then
+            COMMITS_COUNT=$(git rev-list --count "v${BASE_VERSION}..HEAD")
+          else
+            LAST_BUMP_COMMIT=$(git log -n 1 --format="%H" --first-parent -m -G '"version":' -- package.json 2>/dev/null || true)
+            COMMITS_COUNT=$(git rev-list --count "${LAST_BUMP_COMMIT}..HEAD" 2>/dev/null || echo 0)
+          fi
 
           if [ "$COMMITS_COUNT" -eq 0 ]; then
             VERSION="$BASE_VERSION"
