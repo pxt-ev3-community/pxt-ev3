@@ -1,4 +1,4 @@
-//% color="#1E90FF"
+//% color="#009FE3"
 //% icon="\uf00a"
 //% weight=110
 namespace basic {
