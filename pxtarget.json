@@ -83,7 +83,33 @@
         },
         "breakBlock": true,
         "continueBlock": true,
-        "bannedCategories": ["images"]
+        "bannedCategories": ["images"],
+        "palette": [
+            "#ffffff",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "paletteNames": [
+            "transparent",
+            "black"
+        ],
+        "screenSize": {
+            "width": 178,
+            "height": 128
+        }
     },
     "compileService": {
         "buildEngine": "dockermake",
@@ -166,6 +192,9 @@
         "importExtensionFiles": true,
         "allowPackageExtensions": true,
         "addNewTypeScriptFile": true,
+        "assetEditor": {
+            "image": true
+        },
         "enabledFeatures": {
             "blocksErrorList": {}
         },
