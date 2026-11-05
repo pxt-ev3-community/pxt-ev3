@@ -66,7 +66,6 @@
 }
 
 
-
 /*******************************
     Menu bar
 *******************************/
@@ -132,7 +131,6 @@
 .ui.item.link.exit-debugmode-btn {
     background: none !important;
 }
-
 
 
 /* Editor menu dropdown */
@@ -307,7 +305,6 @@
 .ui.button.icon-and-text.label {
     flex-shrink: 0;
 }
-
 
 
 
@@ -645,4 +642,131 @@ body.pxt-theme-root .modal>.closeIcon {
 .blocks-menuitem i.icon.blocks:before {
     font-family: 'legoIcons' !important;
     content: "\f119" !important;
+}
+
+
+
+/*******************************
+    EV3 Asset Editor styling
+*******************************/
+/* Hide the multi-color palette button (EV3 is monochrome only) */
+.asset-palette-button {
+    display: none !important;
+}
+
+/* EV3-styled sidebar buttons: flat, no border, left-aligned icon and text */
+.asset-editor-button {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-neutral-foreground1) !important;
+    margin: 0 0 0.35rem 0 !important;
+    padding: 0.65rem 1rem !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+
+    &:hover, &:focus {
+        background-color: var(--pxt-neutral-alpha20) !important;
+        color: var(--pxt-neutral-base, #333333) !important;
+    }
+
+    .common-button-flex {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: 100% !important;
+        text-align: left !important;
+    }
+
+    i.icon {
+        width: 1.5rem !important;
+        min-width: 1.5rem !important;
+        text-align: center !important;
+        margin: 0 0.65rem 0 0 !important;
+        font-size: 1rem !important;
+        display: inline-block !important;
+        opacity: 0.85;
+    }
+
+    .common-button-label {
+        flex: 1 !important;
+        text-align: left !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+}
+
+/* EV3-styled "+ New Asset" tile: remove arcade green, use clean EV3 dashed card */
+.create-new.common-button {
+    background-color: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-header-stencil, #00838f) !important;
+    border: 2px dashed var(--pxt-neutral-alpha30) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+
+    &:hover {
+        background-color: var(--pxt-neutral-alpha20) !important;
+        border-color: var(--pxt-header-stencil, #00838f) !important;
+    }
+}
+
+/* EV3-styled asset cards */
+.asset-editor-card {
+    border-radius: 6px !important;
+    border: 1px solid var(--pxt-neutral-stencil1) !important;
+    box-shadow: none !important;
+    overflow: hidden;
+
+    &.selected {
+        border: 2px solid var(--pxt-header-stencil, #00838f) !important;
+    }
+}
+
+/* Hide extraneous color swatches in the sprite editor (keep only Transparent [1] and Black [2]) */
+.image-editor-color-buttons .image-editor-button:nth-child(n+3) {
+    display: none !important;
+}
+
+/* Delete asset modal and common modal footer buttons */
+.common-modal-footer button:only-child {
+    justify-self: end !important;
+    width: auto !important;
+}
+
+.common-modal-footer .common-button {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.asset-editor-delete-dialog .common-modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 1rem !important;
+
+    .common-button {
+        width: auto !important;
+        min-width: 8rem !important;
+        margin: 0 !important;
+        padding: 0.78571429em 1.5em !important;
+        min-height: 2.75rem !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        line-height: 1em !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+    }
 }
