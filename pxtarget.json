@@ -75,9 +75,13 @@
         "textBlocks": true,
         "listsBlocks": true,
         "functionBlocks": true,
-        "onStartNamespace": "loops",
+        "onStartNamespace": "basic",
         "onStartWeight": 100,
-        "onStartColor": "#58AB41",
+        "onStartColor": "#009FE3",
+        "foreverNamespace": "basic",
+        "foreverWeight": 90,
+        "pauseNamespace": "basic",
+        "pauseWeight": 80,
         "pauseUntilBlock": {
             "category": "loops"
         },
@@ -181,6 +185,7 @@
             }
         },
         "blockColors": {
+            "basic": "#009FE3",
             "loops": "#58AB41",
             "logic": "#1E5AA8",
             "math": "#7396C8",
