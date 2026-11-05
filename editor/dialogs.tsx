@@ -267,7 +267,9 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
                 fileName: fn
             }
         ]
-    }).then(() => {});
+    }).then(() => {
+        // Pass
+    });
 }
 
 async function showBluetoothPairingDialogAsync(): Promise<boolean> {
@@ -324,7 +326,9 @@ export function showEv3ConnectionFailedDialogAsync(): Promise<void> {
                 <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
             </div>
         )
-    }).then(() => {});
+    }).then(() => {
+        // Pass
+    });
 }
 
 export async function showBluetoothConnectionStuckDialogAsync(): Promise<void> {
