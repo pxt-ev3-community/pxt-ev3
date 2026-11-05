@@ -84,19 +84,19 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
         agreeLbl: lf("I got it"),
         className: 'downloaddialog',
         buttons: [
-            canUseWebSerial() && {
-                label: lf("Bluetooth"),
-                icon: "bluetooth",
-                className: "bluetooth focused",
-                onclick: () => {
-                    selectedTransport = UploadMethod.Bluetooth;
-                }
-            }, downloadFile && {
+            downloadFile && {
                 label: projectName + ".uf2",
                 icon: "download",
                 className: "lightgrey focused",
                 onclick: () => {
                     selectedTransport = UploadMethod.FileTransfer;
+                }
+            }, canUseWebSerial() && {
+                label: lf("Bluetooth"),
+                icon: "bluetooth",
+                className: "bluetooth focused",
+                onclick: () => {
+                    selectedTransport = UploadMethod.Bluetooth;
                 }
             }, docUrl && {
                 label: lf("Help"),
