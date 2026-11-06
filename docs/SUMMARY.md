@@ -55,6 +55,8 @@
         * [show value](/reference/brick/show-value)
         * [show mood](/reference/brick/show-mood)
         * [show image](/reference/brick/show-image)
+        * [draw image](/reference/brick/draw-image)
+        * [image dimension](/reference/brick/image-dimension)
         * [clear screen](/reference/brick/clear-screen)
         * [show ports](/reference/brick/show-ports)
         * [on event](/reference/brick/button/on-event)

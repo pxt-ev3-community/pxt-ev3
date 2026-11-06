@@ -391,7 +391,7 @@ namespace brick {
     //% weight=98
     //% blockGap=8
     //% group="Screen"
-    //% help=images/get-dimension
+    //% help=brick/image-dimension
     //% picture.shadow=screen_sprite_image
     export function imageDimension(picture: Image, dimension: image.Dimension): number {
         return picture ? image.getDimension(picture, dimension) : 0;
