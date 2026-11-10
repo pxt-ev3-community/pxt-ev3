@@ -22,11 +22,11 @@
     fill-opacity: .9 !important;
 } */
 
-/* Positive button */
+/* Positive button (remove border to match standard button height of 41.11px with .lightgrey and .bluetooth) */
 .ui.button.positive {
     background-color: var(--pxt-primary-background) !important;
     color: var(--pxt-primary-foreground) !important;
-    border: 1px solid var(--pxt-primary-background) !important;
+    border: none !important;
 }
 .ui.button.positive:not(.disabled):hover {
     filter: grayscale(.15) brightness(.85) contrast(1.3) !important;

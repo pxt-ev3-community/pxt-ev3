@@ -398,6 +398,22 @@
     margin: 0;
 }
 
+/* Extension tags: keep pill shape and padding */
+body.pxt-theme-root .extension-tag,
+.extension-tags .extension-tag {
+    border-radius: 1.6rem !important;
+    padding: .6rem 1.25rem !important;
+}
+
+/* Modal footer buttons (e.g. Choose a Theme Apply/Reset, etc.):
+   Match standard modal action button height (~41.11px) from Semantic UI */
+.common-modal-footer .common-button {
+    font-size: 14px; /* Match Semantic UI button font size (14px) */
+    padding: .78571429em 1.5em;
+    border-radius: 0;
+    line-height: 1em; /* Match standard 41.11px modal action button height */
+}
+
 /* Neutral button */
 body.pxt-theme-root .common-button.neutral, 
     body.pxt-theme-root .ui.button.neutral {
@@ -531,6 +547,23 @@ body.pxt-theme-root .modal>.closeIcon {
 /* Json settings common-input-group height */
 .pxt-json-settings .common-input-wrapper .common-input-group {
     height: 2.5rem;
+}
+
+/* Project settings (pxtJsonEditor) Go back button:
+   Match dimensions and internal paddings of home gallery buttons (.gallery-actions button) */
+#pxtJsonEditor .common-button.green {
+    padding: .75em !important;
+    border-radius: 0;
+
+    .common-button-flex {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+
+        > i:first-child {
+            margin: 0;
+        }
+    }
 }
 
 /* Card hover gray icon */

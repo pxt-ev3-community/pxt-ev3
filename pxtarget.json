@@ -132,11 +132,11 @@
         "disableLiveTranslations": false,
         "lightToc": true,
         "docMenu": [{
-                "name": "BrickCode discussions",
+                "name": "BrickCode Discussions",
                 "path": "https://github.com/orgs/pxt-ev3-community/discussions"
             },
             {
-                "name": "MakeCode forum",
+                "name": "MakeCode Forum",
                 "path": "https://forum.makecode.com/"
             },
             {
