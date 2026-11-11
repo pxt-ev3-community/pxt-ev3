@@ -14,28 +14,51 @@ function checkDocsBetaUrl()
 }
 
 /* Rewrite XMLHttpRequest urls to download translated docs from MakeCode API when needed. */
-function bindDocsXHROpen()
-{
-    console.log("Here1");
-    const docurl = window.location.hash;
-    if (docurl.startsWith("#doc:/docs") && !docurl.endsWith(":en"))
-    {
-        const originalOpen = XMLHttpRequest.prototype.open;
 
-        XMLHttpRequest.prototype.open = function(method, url, ...rest)
-        {
-            console.log("Here2 " + url);
-            const match = url.match(/docs\/([\w\/]+).md\?lang=([\w-]+)$/);
-            if (match) {
-                const newurl = "https://cdn.makecode.com/api/md/ev3/" + match[1] + "?targetVersion=1.4.41&lang=" + match[2];
-                console.log("Getting translated docs for " + url + " from " + newurl);
-                return originalOpen.apply(this, [method, newurl, ...rest]);
+/* Redirect external GitHub tutorial requests on static sites. */
+function bindGitHubTutorialXHROpen()
+{
+    const tutorialApi = "https://cdn.makecode.com/api/ghtutorial/";
+    const localTutorialPath =
+        new URL("ghtutorial/", window.location.href).pathname;
+
+    const originalOpen = XMLHttpRequest.prototype.open;
+
+    XMLHttpRequest.prototype.open = function(method, url, ...rest)
+    {
+        if (String(method).toUpperCase() === "GET") {
+            let requestUrl;
+
+            try {
+                requestUrl = new URL(String(url), window.location.href);
+            } catch (e) {
+                // Let normal XHR handling deal with invalid URLs.
             }
 
-            return originalOpen.apply(this, [method, url, ...rest]);
-        };
-    }
+            if (requestUrl &&
+                requestUrl.origin === window.location.origin &&
+                requestUrl.pathname.startsWith(localTutorialPath))
+            {
+                const tutorialPath =
+                    requestUrl.pathname.slice(localTutorialPath.length);
+
+                if (tutorialPath) {
+                    const newUrl =
+                        tutorialApi + tutorialPath + requestUrl.search;
+
+                    console.info("External tutorial redirected:", newUrl);
+                    return originalOpen.call(
+                        this, method, newUrl, ...rest
+                    );
+                }
+            }
+        }
+
+        return originalOpen.call(this, method, url, ...rest);
+    };
 }
+
+bindGitHubTutorialXHROpen();
 
 if (window.location.pathname.split('/').pop() == "docs.html")
 {
