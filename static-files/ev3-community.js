@@ -14,6 +14,26 @@ function checkDocsBetaUrl()
 }
 
 /* Rewrite XMLHttpRequest urls to download translated docs from MakeCode API when needed. */
+function bindDocsXHROpen()
+{
+    console.log("Here1");
+    const docurl = window.location.hash;
+    if (docurl.startsWith("#doc:/docs") && !docurl.endsWith(":en"))
+    {
+        const originalOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url, ...rest)
+        {
+            console.log("Here2 " + url);
+            const match = url.match(/docs\/([\w\/]+).md\?lang=([\w-]+)$/);
+            if (match) {
+                const newurl = "https://cdn.makecode.com/api/md/ev3/" + match[1] + "?targetVersion=1.4.41&lang=" + match[2];
+                console.log("Getting translated docs for " + url + " from " + newurl);
+                return originalOpen.apply(this, [method, newurl, ...rest]);
+            }
+            return originalOpen.apply(this, [method, url, ...rest]);
+        };
+    }
+}
 
 /* Redirect external GitHub tutorial requests on static sites. */
 function bindGitHubTutorialXHROpen()
@@ -46,7 +66,6 @@ function bindGitHubTutorialXHROpen()
                     const newUrl =
                         tutorialApi + tutorialPath + requestUrl.search;
 
-                    console.info("External tutorial redirected:", newUrl);
                     return originalOpen.call(
                         this, method, newUrl, ...rest
                     );
