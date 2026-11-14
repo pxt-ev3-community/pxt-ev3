@@ -1,17 +1,19 @@
 import * as React from "react";
 
-import { canUseWebSerial, setUseFileTransfer, setUseBluetoothWebSerial, resetDeployTransport } from "./deploy";
+import { 
+    canUseWebSerial, 
+    canUseWebHID,
+    setUseFileTransfer, 
+    setUseUsbWebHID,
+    setUseBluetoothWebSerial, 
+    resetDeployTransport, 
+    DeployTransport 
+} from "./deploy";
 import { projectView } from "./extension";
 
 
-enum UploadMethod {
-    None,
-    FileTransfer,
-    // HID,
-    Bluetooth
-}
-
 let skipFileTransferDialog = false;
+let skipUsbPairingDialog = false;
 let skipBluetoothPairingDialog = false;
 
 let confirmAsync: (options: any) => Promise<number>;
@@ -22,6 +24,10 @@ export function setConfirmAsync(fn: (options: any) => Promise<number>) {
 
 export function resetFileTransferDialog() {
     skipFileTransferDialog = false;
+}
+
+export function resetUsbPairingDialog() {
+    skipUsbPairingDialog = false;
 }
 
 export function resetBluetoothPairingDialog() {
@@ -36,7 +42,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
     // Data URIs cannot be used for navigation, for scripting, or to populate frame or iframe elements"
     const downloadFile = !pxt.BrowserUtils.isIE() && !pxt.BrowserUtils.isEdge();
     const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
-    let selectedTransport = UploadMethod.None;
+    let selectedTransport = DeployTransport.None;
 
     const jsx =
         <div className="ui grid stackable">
@@ -49,26 +55,52 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 <a href="/troubleshoot" target="_blank">{lf("Check your firmware version here and update if needed")}</a>
             </div>
             <div className="eleven wide column">
-                <div className="ui grid">
+                <div className="ui grid download-options">
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>1</span>
-                            <strong>{lf("File Transfer")}</strong>
-                            <p>{lf("This is the standard way to transfer a program to your EV3. Download the program as a file and transfer it to the EV3 manually.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">1</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("File Transfer")}</strong>
+                                    <p>{lf("This is the standard way to transfer a program to your EV3. Download the program as a file and transfer it to the EV3 manually. The program is saved to the standard folder.")}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>2</span>
-                            <strong>{lf("Bluetooth")}</strong>
-                            <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">2</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("USB")}</strong>
+                                    <p>{lf("Upload the program directly to your EV3 over a USB cable connection using WebHID.")}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui green circular label" style={{ marginRight: "0.75em" }}>!</span>
-                            <strong>{lf("Note")}</strong>
-                            <p>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">3</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("Bluetooth")}</strong>
+                                    <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="sixteen wide column">
+                            <div className="download-step">
+                                <span className="ui orange circular label">*</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("Note")}</strong>
+                                    <ul className="ui bulleted list">
+                                        <li>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</li>
+                                        <li>{lf("USB and Bluetooth allow uploading to a custom folder specified in project settings.")}</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -80,8 +112,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
         jsx,
         hasCloseIcon: true,
         hideCancel: true,
-        hideAgree: false,
-        agreeLbl: lf("I got it"),
+        hideAgree: true,
         className: 'downloaddialog',
         buttons: [
             downloadFile && {
@@ -89,14 +120,21 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 icon: "download",
                 className: "lightgrey focused",
                 onclick: () => {
-                    selectedTransport = UploadMethod.FileTransfer;
+                    selectedTransport = DeployTransport.FileTransfer;
+                }
+            }, canUseWebHID() && {
+                label: lf("USB"),
+                icon: "usb",
+                className: "usb focused",
+                onclick: () => {
+                    selectedTransport = DeployTransport.UsbWebHid;
                 }
             }, canUseWebSerial() && {
                 label: lf("Bluetooth"),
                 icon: "bluetooth",
                 className: "bluetooth focused",
                 onclick: () => {
-                    selectedTransport = UploadMethod.Bluetooth;
+                    selectedTransport = DeployTransport.BluetoothWebSerial;
                 }
             }, docUrl && {
                 label: lf("Help"),
@@ -104,16 +142,33 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 className: "lightgrey",
                 url: docUrl
             }
-        ]
+        ].filter(Boolean)
         //timeout: 20000
     }).then(() => {
         switch (selectedTransport) {
-            case UploadMethod.FileTransfer:
+            case DeployTransport.FileTransfer:
                 pxt.tickEvent("upload.fileTransfer");
                 setUseFileTransfer();
 
                 return projectView.compile();
-            case UploadMethod.Bluetooth:
+            case DeployTransport.UsbWebHid:
+                pxt.tickEvent("upload.usbhid");
+                setUseUsbWebHID();
+
+                return showUsbPairingDialogAsync()
+                    .then(shouldContinue => {
+                    if (!shouldContinue) {
+                        pxt.tickEvent("upload.cancel");
+                        resetDeployTransport();
+                        resetFileTransferDialog();
+                        resetBluetoothPairingDialog();
+                        resetUsbPairingDialog();
+                        return;
+                    }
+
+                    return projectView.compile();
+                });
+            case DeployTransport.BluetoothWebSerial:
                 pxt.tickEvent("upload.bluetooth");
                 setUseBluetoothWebSerial();
                 
@@ -124,6 +179,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                         resetDeployTransport();
                         resetFileTransferDialog();
                         resetBluetoothPairingDialog();
+                        resetUsbPairingDialog();
                         return;
                     }
 
@@ -265,6 +321,44 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
     });
 }
 
+export async function showUsbPairingDialogAsync(): Promise<boolean> {
+    if (!confirmAsync || skipUsbPairingDialog) return Promise.resolve(true);
+
+    const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
+
+    const jsx = (
+        <div>
+            <p>{lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}</p>
+            <p>{lf("Connect your EV3 to your computer with a USB cable and make sure the brick is turned on.")}</p>
+            <p>{lf("When prompted by the browser, select 'Xfer data to and from EV3 brick' and click 'Connect'.")}</p>
+            <div className="ui toggle checkbox">
+                <input
+                    type="checkbox"
+                    onChange={e => {
+                        skipUsbPairingDialog = e.currentTarget.checked;
+                    }}
+                />
+                <label>{lf("Don't show this again")}</label>
+            </div>
+        </div>
+    );
+
+    return confirmAsync({
+        header: lf("USB connection"),
+        jsx,
+        hasCloseIcon: true,
+        hideCancel: true,
+        buttons: [
+            docUrl && {
+                label: lf("Help"),
+                icon: "question circle",
+                className: "lightgrey",
+                url: docUrl
+            }
+        ].filter(Boolean)
+    }).then(result => result === 1);
+}
+
 async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     if (!confirmAsync || skipBluetoothPairingDialog) return Promise.resolve(true);
 
@@ -304,8 +398,10 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     }).then(result => result === 1);
 }
 
-export function showEv3ConnectionFailedDialogAsync(): Promise<void> {
+export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTransport): Promise<void> {
     if (!confirmAsync) return Promise.resolve();
+
+    const isUsb = transportType === DeployTransport.UsbWebHid;
 
     return confirmAsync({
         header: lf("Could not connect to EV3"),
@@ -315,8 +411,17 @@ export function showEv3ConnectionFailedDialogAsync(): Promise<void> {
         agreeLbl: lf("OK"),
         jsx: (
             <div>
-                <p>{lf("The selected serial port did not respond as an EV3 device.")}</p>
-                <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
+                {isUsb ? (
+                    <div>
+                        <p>{lf("The selected USB device did not respond as an EV3 device.")}</p>
+                        <p>{lf("Make sure your EV3 is turned on and connected to your computer with a USB cable, then try again.")}</p>
+                    </div>
+                ) : (
+                    <div>
+                        <p>{lf("The selected serial port did not respond as an EV3 device.")}</p>
+                        <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
+                    </div>
+                )}
             </div>
         )
     }).then(() => {
