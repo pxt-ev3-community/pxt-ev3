@@ -160,36 +160,124 @@ void close_stderr() {
     fclose(stderr);
 }
 
+static pthread_mutex_t usbWriteMutex = PTHREAD_MUTEX_INITIALIZER;
+
+static void sendReply(int outFd, const uint8_t *reply, int replyTotalLen, bool isUsb) {
+    if (outFd < 0) return;
+    if (isUsb) {
+        uint8_t usbBuf[1024] = {};
+        if (replyTotalLen > 1024) replyTotalLen = 1024;
+        memcpy(usbBuf, reply, replyTotalLen);
+        pthread_mutex_lock(&usbWriteMutex);
+        write(outFd, usbBuf, sizeof(usbBuf));
+        pthread_mutex_unlock(&usbWriteMutex);
+    } else {
+        write(outFd, reply, replyTotalLen);
+    }
+}
+
+static void sendSystemReply(int outFd, bool isUsb, uint16_t msgcount, uint8_t command, uint16_t status) {
+    const int replySize = 6;
+    uint8_t reply[8] = {};
+    reply[0] = replySize & 0xff;
+    reply[1] = (replySize >> 8) & 0xff;
+    reply[2] = msgcount & 0xff;
+    reply[3] = (msgcount >> 8) & 0xff;
+    reply[4] = 0x03;
+    reply[5] = command;
+    reply[6] = status & 0xff;
+    reply[7] = (status >> 8) & 0xff;
+    // DMESG("SYSTEM REPLY msgcount=%04x command=%02x status=%04x size=%d isUsb=%d", msgcount, command, status, replySize, isUsb);
+    sendReply(outFd, reply, replySize + 2, isUsb);
+}
+
+static void sendDirectReply(int outFd, bool isUsb, uint16_t msgcount, const uint8_t *data = NULL, int dataLen = 0) {
+    const int replySize = 3 + dataLen;
+    uint8_t reply[256] = {};
+    reply[0] = replySize & 0xff;
+    reply[1] = (replySize >> 8) & 0xff;
+    reply[2] = msgcount & 0xff;
+    reply[3] = (msgcount >> 8) & 0xff;
+    reply[4] = 0x02;
+    if (dataLen > 0) {
+        memcpy(reply + 5, data, dataLen);
+    }
+    // DMESG("DIRECT REPLY msgcount=%04x size=%d isUsb=%d", msgcount, replySize, isUsb);
+    sendReply(outFd, reply, replySize + 2, isUsb);
+}
+
+// Parse a complete LEGO communication packet received over RFCOMM or USB.
+// Distinguish custom and system packets and extract the system payload.
+static void handlePacket(const uint8_t *packet, int totalLen, int outFd, bool isUsb) {
+    if (totalLen < 6) {
+        // DMESG("Packet too short len=%d", totalLen);
+        return;
+    }
+
+    int msgLen = packet[0] | (packet[1] << 8);
+    uint16_t msgcount = packet[2] | (packet[3] << 8);
+
+    if (msgLen + 2 > totalLen) {
+        // DMESG("Packet length mismatch msglen=%d total=%d", msgLen, totalLen);
+        return;
+    }
+
+    // LEGO Direct Command: opNop
+    if (packet[4] == 0x00 && totalLen >= 8 && packet[7] == 0x01) {
+        sendDirectReply(outFd, isUsb, msgcount, NULL, 0);
+        return;
+    }
+
+    // LEGO Direct Command: opCOM_GET / GET_BRICKNAME
+    if (packet[4] == 0x00 && totalLen >= 12 && packet[7] == 0xD3 && packet[8] == 0x0D) {
+        uint8_t name[VM_BRICK_NAME_SIZE] = {};
+        memcpy(name, ev3BrickName, sizeof(name));
+        sendDirectReply(outFd, isUsb, msgcount, name, sizeof(name));
+        return;
+    }
+
+    // Custom commands (USB_RFCOMM_MAGIC = 0x3d3f)
+    if (totalLen >= 8 && packet[4] == (USB_RFCOMM_MAGIC & 0xff) && packet[5] == ((USB_RFCOMM_MAGIC >> 8) & 0xff)) {
+        uint16_t code = packet[6] | (packet[7] << 8);
+        DMESG("CUSTOM PACKET msgcount=%04x magic=3d3f code=%04x isUsb=%d", msgcount, code, isUsb);
+
+        if (code == RFCOMM_STOP) {
+            sendSystemReply(outFd, isUsb, msgcount, 2, 0);
+            sleep_core_us(10000);
+            target_reset();
+        } else if (code == RFCOMM_PING) {
+            if (isUsb) dumpDmesg();
+            sendSystemReply(outFd, isUsb, msgcount, 3, 0);
+        }
+
+        return;
+    }
+
+    int payloadLen = totalLen - 6;
+    if (payloadLen > 0) {
+        char payload[1024];
+        int copyLen = payloadLen;
+
+        if (copyLen >= (int)sizeof(payload)) {
+            copyLen = sizeof(payload) - 1;
+        }
+
+        memcpy(payload, packet + 6, copyLen);
+        payload[copyLen] = 0;
+    }
+}
 
 void *usbThread(void *) {
-    UsbPacket pkt;
-    UsbPacket resp;
+    uint8_t pktBuf[1024];
 
     while (true) {
-        int len = read(usbFD, &pkt, sizeof(pkt));
+        int len = read(usbFD, pktBuf, sizeof(pktBuf));
         if (len <= 4) {
             sleep_core_us(20000);
             continue;
         }
-        // DMESG("USB THREAD magic=%04x code=%04x msg=%04x", pkt.magic, pkt.code, pkt.msgcount);
-        resp.msgcount = pkt.msgcount;
-        if (pkt.magic == USB_RFCOMM_MAGIC) {
-            if (pkt.code == USB_RESTART) {
-                target_reset();
-            } else if (pkt.code == USB_DMESG) {
-                dumpDmesg();
-            }
-            /*
-            resp.magic = pkt.magic;
-            resp.code = pkt.code;
-            resp.size = 8;
-            write(usbFD, &resp, sizeof(resp));
-            */
-        } else {
-            resp.magic = 0xffff;
-            resp.size = 4;
-            write(usbFD, &resp, sizeof(resp));
-        }
+
+        handlePacket(pktBuf, len, usbFD, true);
         sleep_core_us(1000);
     }
 }
@@ -218,7 +306,9 @@ void sendUsb(uint16_t code, const char *data, int len) {
         }
         UsbPacket pkt = {(uint16_t)(6 + sz), 0, USB_RFCOMM_MAGIC, code, {}};
         memcpy(pkt.buf, data, sz);
+        pthread_mutex_lock(&usbWriteMutex);
         write(usbFD, &pkt, sizeof(pkt));
+        pthread_mutex_unlock(&usbWriteMutex);
         len -= sz;
         data += sz;
     }
@@ -269,99 +359,6 @@ static int findRfcommSocket() {
     DMESG("RFCOMM connected socket not found");
     return -1;
 }
-
-static void sendSystemReply(uint16_t msgcount, uint8_t command, uint16_t status) {
-    const int replySize = 6;
-    uint8_t reply[8] = {};
-    reply[0] = replySize & 0xff;
-    reply[1] = (replySize >> 8) & 0xff;
-    reply[2] = msgcount & 0xff;
-    reply[3] = (msgcount >> 8) & 0xff;
-    reply[4] = 0x03;
-    reply[5] = command;
-    reply[6] = status & 0xff;
-    reply[7] = (status >> 8) & 0xff;
-    // DMESG("RFCOMM SYSTEM REPLY msgcount=%04x command=%02x status=%04x size=%d", msgcount, command, status, replySize);
-    write(rfcommFD, reply, replySize + 2);
-}
-
-static void sendDirectReply(uint16_t msgcount, const uint8_t *data = NULL, int dataLen = 0) {
-    const int replySize = 3 + dataLen;
-    uint8_t reply[256] = {};
-    reply[0] = replySize & 0xff;
-    reply[1] = (replySize >> 8) & 0xff;
-    reply[2] = msgcount & 0xff;
-    reply[3] = (msgcount >> 8) & 0xff;
-    reply[4] = 0x02;
-    if (dataLen > 0) {
-        memcpy(reply + 5, data, dataLen);
-    }
-    // DMESG("RFCOMM DIRECT REPLY msgcount=%04x size=%d", msgcount, replySize);
-    write(rfcommFD, reply, replySize + 2);
-}
-
-// Parse a complete LEGO communication packet received over RFCOMM.
-// Distinguish custom and system packets and extract the system payload.
-static void handleRfcommPacket(const uint8_t *packet, int totalLen) {
-    if (totalLen < 6) {
-        DMESG("RFCOMM packet too short len=%d", totalLen);
-        return;
-    }
-
-    int msgLen = packet[0] | (packet[1] << 8);
-    uint16_t msgcount = packet[2] | (packet[3] << 8);
-
-    if (msgLen + 2 != totalLen) {
-        DMESG("RFCOMM length mismatch msglen=%d total=%d", msgLen, totalLen);
-        return;
-    }
-
-    // LEGO Direct Command: opNop
-    if (packet[4] == 0x00 && totalLen >= 8 && packet[7] == 0x01) {
-        sendDirectReply(msgcount, NULL, 0);
-        return;
-    }
-
-    // LEGO Direct Command: opCOM_GET / GET_BRICKNAME
-    if (packet[4] == 0x00 && totalLen >= 12 && packet[7] == 0xD3 && packet[8] == 0x0D) {
-        uint8_t name[VM_BRICK_NAME_SIZE] = {};
-        memcpy(name, ev3BrickName, sizeof(name));
-        sendDirectReply(msgcount, name, sizeof(name));
-        return;
-    }
-
-    // RFCOMM custom
-    if (totalLen >= 8 && packet[4] == (USB_RFCOMM_MAGIC & 0xff) && packet[5] == ((USB_RFCOMM_MAGIC >> 8) & 0xff)) {
-        uint16_t code = packet[6] | (packet[7] << 8);
-        DMESG("RFCOMM CUSTOM msgcount=%04x magic=3d3f code=%04x", msgcount, code);
-
-        if (code == RFCOMM_STOP) {
-            sendSystemReply(msgcount, 2, 0);
-            sleep_core_us(10000);
-            target_reset();
-        }  else if (code == RFCOMM_PING) {
-            sendSystemReply(msgcount, 3, 0);
-        }
-
-        return;
-    }
-
-    // DMESG("RFCOMM SYSTEM msgcount=%04x type=%02x command=%02x", msgcount, packet[4], packet[5]);
-
-    int payloadLen = totalLen - 6;
-    if (payloadLen > 0) {
-        char payload[1024];
-        int copyLen = payloadLen;
-
-        if (copyLen >= (int)sizeof(payload)) {
-            copyLen = sizeof(payload) - 1;
-        }
-
-        memcpy(payload, packet + 6, copyLen);
-        payload[copyLen] = 0;
-    }
-}
-
 
 // Read and process complete packets from the existing RFCOMM connection.
 // Data may arrive in several reads or contain multiple packets in one read, so bytes are accumulated until a complete packet is available.
@@ -431,7 +428,7 @@ static void *rfcommThread(void *) {
             int totalLen = msgLen + 2;
 
             // DMESG("RFCOMM THREAD COMPLETE PACKET len=%d", totalLen);
-            handleRfcommPacket(packetBuf, totalLen);
+            handlePacket(packetBuf, totalLen, rfcommFD, false);
 
             int remaining = packetLen - totalLen;
             if (remaining > 0) {

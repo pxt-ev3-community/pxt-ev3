@@ -1,17 +1,26 @@
 import * as React from "react";
 
-import { canUseWebSerial, setUseFileTransfer, setUseBluetoothWebSerial, resetDeployTransport } from "./deploy";
+import { 
+    canUseWebSerial, 
+    canUseWebHID,
+    setUseFileTransfer, 
+    setUseUsbHID,
+    setUseBluetoothWebSerial, 
+    resetDeployTransport, 
+    DeployTransport 
+} from "./deploy";
 import { projectView } from "./extension";
 
 
 enum UploadMethod {
     None,
     FileTransfer,
-    // HID,
+    UsbHid,
     Bluetooth
 }
 
 let skipFileTransferDialog = false;
+let skipUsbPairingDialog = false;
 let skipBluetoothPairingDialog = false;
 
 let confirmAsync: (options: any) => Promise<number>;
@@ -22,6 +31,10 @@ export function setConfirmAsync(fn: (options: any) => Promise<number>) {
 
 export function resetFileTransferDialog() {
     skipFileTransferDialog = false;
+}
+
+export function resetUsbPairingDialog() {
+    skipUsbPairingDialog = false;
 }
 
 export function resetBluetoothPairingDialog() {
@@ -60,6 +73,13 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                     <div className="row">
                         <div className="sixteen wide column">
                             <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>2</span>
+                            <strong>{lf("USB")}</strong>
+                            <p>{lf("Upload the program directly to your EV3 over a USB cable connection using WebHID.")}</p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="sixteen wide column">
+                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>3</span>
                             <strong>{lf("Bluetooth")}</strong>
                             <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
                         </div>
@@ -91,6 +111,13 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 onclick: () => {
                     selectedTransport = UploadMethod.FileTransfer;
                 }
+            }, canUseWebHID() && {
+                label: lf("USB"),
+                icon: "usb",
+                className: "usb focused",
+                onclick: () => {
+                    selectedTransport = UploadMethod.UsbHid;
+                }
             }, canUseWebSerial() && {
                 label: lf("Bluetooth"),
                 icon: "bluetooth",
@@ -104,7 +131,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 className: "lightgrey",
                 url: docUrl
             }
-        ]
+        ].filter(Boolean)
         //timeout: 20000
     }).then(() => {
         switch (selectedTransport) {
@@ -113,6 +140,23 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 setUseFileTransfer();
 
                 return projectView.compile();
+            case UploadMethod.UsbHid:
+                pxt.tickEvent("upload.usbhid");
+                setUseUsbHID();
+
+                return showUsbPairingDialogAsync()
+                    .then(shouldContinue => {
+                    if (!shouldContinue) {
+                        pxt.tickEvent("upload.cancel");
+                        resetDeployTransport();
+                        resetFileTransferDialog();
+                        resetBluetoothPairingDialog();
+                        resetUsbPairingDialog();
+                        return;
+                    }
+
+                    return projectView.compile();
+                });
             case UploadMethod.Bluetooth:
                 pxt.tickEvent("upload.bluetooth");
                 setUseBluetoothWebSerial();
@@ -124,6 +168,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                         resetDeployTransport();
                         resetFileTransferDialog();
                         resetBluetoothPairingDialog();
+                        resetUsbPairingDialog();
                         return;
                     }
 
@@ -265,6 +310,44 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
     });
 }
 
+export async function showUsbPairingDialogAsync(): Promise<boolean> {
+    if (!confirmAsync || skipUsbPairingDialog) return Promise.resolve(true);
+
+    const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
+
+    const jsx = (
+        <div>
+            <p>{lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}</p>
+            <p>{lf("Connect your EV3 to your computer with a USB cable and make sure the brick is turned on.")}</p>
+            <p>{lf("When prompted by the browser, select 'Xfer data to and from EV3 brick' and click 'Connect'.")}</p>
+            <div className="ui toggle checkbox">
+                <input
+                    type="checkbox"
+                    onChange={e => {
+                        skipUsbPairingDialog = e.currentTarget.checked;
+                    }}
+                />
+                <label>{lf("Don't show this again")}</label>
+            </div>
+        </div>
+    );
+
+    return confirmAsync({
+        header: lf("USB connection"),
+        jsx,
+        hasCloseIcon: true,
+        hideCancel: true,
+        buttons: [
+            docUrl && {
+                label: lf("Help"),
+                icon: "question circle",
+                className: "lightgrey",
+                url: docUrl
+            }
+        ].filter(Boolean)
+    }).then(result => result === 1);
+}
+
 async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     if (!confirmAsync || skipBluetoothPairingDialog) return Promise.resolve(true);
 
@@ -304,8 +387,10 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     }).then(result => result === 1);
 }
 
-export function showEv3ConnectionFailedDialogAsync(): Promise<void> {
+export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTransport): Promise<void> {
     if (!confirmAsync) return Promise.resolve();
+
+    const isUsb = transportType === DeployTransport.UsbHid;
 
     return confirmAsync({
         header: lf("Could not connect to EV3"),
@@ -315,8 +400,17 @@ export function showEv3ConnectionFailedDialogAsync(): Promise<void> {
         agreeLbl: lf("OK"),
         jsx: (
             <div>
-                <p>{lf("The selected serial port did not respond as an EV3 device.")}</p>
-                <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
+                {isUsb ? (
+                    <div>
+                        <p>{lf("The selected USB device did not respond as an EV3 device.")}</p>
+                        <p>{lf("Make sure your EV3 is turned on and connected to your computer with a USB cable, then try again.")}</p>
+                    </div>
+                ) : (
+                    <div>
+                        <p>{lf("The selected serial port did not respond as an EV3 device.")}</p>
+                        <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
+                    </div>
+                )}
             </div>
         )
     }).then(() => {

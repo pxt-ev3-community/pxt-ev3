@@ -97,7 +97,7 @@ export class Ev3Wrapper {
         return buf;
     }
 
-    private allocCustom(code: number, addSize = 0) {
+    allocCustom(code: number, addSize = 0) {
         let buf = this.allocCore(1 + 2 + addSize, 0);
         HF2.write16(buf, 4, usbRfcommMagic);
         HF2.write16(buf, 6, code);
@@ -105,23 +105,45 @@ export class Ev3Wrapper {
         return buf;
     }
 
-    stopAsync() {
-        // log(`PXT app is running, sending stop command`);
+    stopAsync(): Promise<void> {
+        log(`PXT app is running, sending stop command`);
 
         const buf = this.allocCustom(rfcommPxtAppStopCommand);
-        return this.talkAsync(buf)
+        return this.talkAsync(buf, 0, 1500)
+            .catch(err => {
+                log(`PXT app stop command not acknowledged, sending fallback: ${err}`);
+                return this.justSendAsync(buf);
+            })
             .then(() => {
-                // log(`PXT app stop command acknowledged`);
-                return pxt.U.delay(500);
+                log(`PXT app stop command completed`);
+                return pxt.U.delay(600);
             });
-    };
+    }
+
+    async tryStopRunningAppAsync(): Promise<boolean> {
+        log("Attempting to stop running PXT app...");
+        const buf = this.allocCustom(rfcommPxtAppStopCommand);
+        try {
+            await this.talkAsync(buf, 0, 1000);
+            log("PXT app stop acknowledged");
+        } catch {
+            log("PXT app stop not acknowledged, sending unacknowledged stop command");
+            try {
+                await this.justSendAsync(buf);
+            } catch (e) {
+                log("Failed to send fallback stop packet: " + e);
+            }
+        }
+        await pxt.U.delay(600);
+        return true;
+    }
 
     isEv3ConnectedAsync(): Promise<boolean> {
         const buf = this.allocCore(3, directCommand);
         HF2.write16(buf, 5, 0x0000);
         buf[7] = opNop; // opNop
 
-        return this.talkAsync(buf)
+        return this.talkAsync(buf, 0, 2000)
             .then(resp => {
                 if (resp[4] !== 0x02) {
                     throw new Error("INVALID_EV3_REPLY");
