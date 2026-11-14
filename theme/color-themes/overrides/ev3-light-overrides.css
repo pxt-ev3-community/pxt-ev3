@@ -96,6 +96,11 @@
     display: flex;
     align-items: flex-start;
 }
+/* Circular step badge alignment and spacing across download dialogs */
+.ui.downloaddialog.modal .circular.label,
+.modal.downloaddialog .circular.label {
+    margin-right: 0.75em;
+}
 /* Circular step badge alignment and spacing */
 .ui.downloaddialog.modal .download-options .download-step .circular.label,
 .modal.downloaddialog .download-options .download-step .circular.label {
