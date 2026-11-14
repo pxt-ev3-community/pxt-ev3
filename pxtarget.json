@@ -228,7 +228,7 @@
         "pxtJsonOptions": [
             {   
                 "property": "uploadProjectFolder",
-                "label": "Custom folder for Bluetooth upload",
+                "label": "Custom Folder for USB and Bluetooth Upload",
                 "type": "input"
             }
         ]
