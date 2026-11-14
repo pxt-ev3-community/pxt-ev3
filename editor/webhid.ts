@@ -8,9 +8,6 @@ enum IOState {
     Connected
 }
 
-const EV3_VENDOR_ID = 0x0694;
-const EV3_PRODUCT_ID = 0x0005;
-
 export class WebHidIO implements pxt.packetio.PacketIO {
     onData = (v: Uint8Array) => {};
     onEvent = (v: Uint8Array) => {};
@@ -46,19 +43,22 @@ export class WebHidIO implements pxt.packetio.PacketIO {
         if (!hid) throw new Error("WEBHID_NOT_SUPPORTED");
 
         let device: any;
+        // Read vendorId and productId directly from pxtarget.json ("serial" configuration)
+        const vendorId = parseInt(pxt.appTarget.serial.vendorId, 16);
+        const productId = parseInt(pxt.appTarget.serial.productId, 16);
 
         if (!forceRequest) {
             const devices = await hid.getDevices();
             if (devices && devices.length > 0) {
                 // Find EV3 device or take first approved device
-                device = devices.find((d: any) => d.vendorId === EV3_VENDOR_ID && (!d.productId || d.productId === EV3_PRODUCT_ID)) || devices[0];
+                device = devices.find((d: any) => d.vendorId === vendorId && (!d.productId || d.productId === productId)) || devices[0];
             }
         }
 
         if (!device) {
             try {
                 const devices = await hid.requestDevice({
-                    filters: [{ vendorId: EV3_VENDOR_ID, productId: EV3_PRODUCT_ID }]
+                    filters: [{ vendorId, productId }]
                 });
                 if (devices && devices.length > 0) {
                     device = devices[0];
