@@ -55,33 +55,52 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 <a href="/troubleshoot" target="_blank">{lf("Check your firmware version here and update if needed")}</a>
             </div>
             <div className="eleven wide column">
-                <div className="ui grid">
+                <div className="ui grid download-options">
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>1</span>
-                            <strong>{lf("File Transfer")}</strong>
-                            <p>{lf("This is the standard way to transfer a program to your EV3. Download the program as a file and transfer it to the EV3 manually.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">1</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("File Transfer")}</strong>
+                                    <p>{lf("This is the standard way to transfer a program to your EV3. Download the program as a file and transfer it to the EV3 manually. The program is saved to the standard folder.")}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>2</span>
-                            <strong>{lf("USB")}</strong>
-                            <p>{lf("Upload the program directly to your EV3 over a USB cable connection using WebHID.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">2</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("USB")}</strong>
+                                    <p>{lf("Upload the program directly to your EV3 over a USB cable connection using WebHID.")}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui yellow circular label" style={{ marginRight: "0.75em" }}>3</span>
-                            <strong>{lf("Bluetooth")}</strong>
-                            <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
+                            <div className="download-step">
+                                <span className="ui yellow circular label">3</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("Bluetooth")}</strong>
+                                    <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <span className="ui green circular label" style={{ marginRight: "0.75em" }}>!</span>
-                            <strong>{lf("Note")}</strong>
-                            <p>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</p>
+                            <div className="download-step">
+                                <span className="ui orange circular label">*</span>
+                                <div className="download-step-content">
+                                    <strong>{lf("Note")}</strong>
+                                    <ul className="ui bulleted list">
+                                        <li>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</li>
+                                        <li>{lf("USB and Bluetooth allow uploading to a custom folder specified in project settings.")}</li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -93,8 +112,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
         jsx,
         hasCloseIcon: true,
         hideCancel: true,
-        hideAgree: false,
-        agreeLbl: lf("OK"),
+        hideAgree: true,
         className: 'downloaddialog',
         buttons: [
             downloadFile && {
