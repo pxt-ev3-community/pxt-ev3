@@ -101,7 +101,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
         hasCloseIcon: true,
         hideCancel: true,
         hideAgree: false,
-        agreeLbl: lf("I got it"),
+        agreeLbl: lf("OK"),
         className: 'downloaddialog',
         buttons: [
             downloadFile && {
