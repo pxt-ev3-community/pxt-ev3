@@ -8,10 +8,10 @@ import { showBluetoothConnectionStuckDialogAsync } from "./dialogs";
 
 
 export enum DeployTransport {
-    NotSelected,
+    None,
     FileTransfer,
     BluetoothWebSerial,
-    UsbHid
+    UsbWebHid
 }
 
 enum TransportState {
@@ -81,7 +81,7 @@ class TransportManager {
             // Don't create a new IO if it already exists
             if (!this.io) {
                 const force = this.state === TransportState.Unpaired;
-                if (transportType === DeployTransport.UsbHid) {
+                if (transportType === DeployTransport.UsbWebHid) {
                     this.io = await WebHidIO.createAsync(force);
                 } else if (transportType === DeployTransport.BluetoothWebSerial) {
                     this.io = await WebSerialIO.createAsync(force);

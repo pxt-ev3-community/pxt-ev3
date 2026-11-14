@@ -4,20 +4,13 @@ import {
     canUseWebSerial, 
     canUseWebHID,
     setUseFileTransfer, 
-    setUseUsbHID,
+    setUseUsbWebHID,
     setUseBluetoothWebSerial, 
     resetDeployTransport, 
     DeployTransport 
 } from "./deploy";
 import { projectView } from "./extension";
 
-
-enum UploadMethod {
-    None,
-    FileTransfer,
-    UsbHid,
-    Bluetooth
-}
 
 let skipFileTransferDialog = false;
 let skipUsbPairingDialog = false;
@@ -49,7 +42,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
     // Data URIs cannot be used for navigation, for scripting, or to populate frame or iframe elements"
     const downloadFile = !pxt.BrowserUtils.isIE() && !pxt.BrowserUtils.isEdge();
     const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
-    let selectedTransport = UploadMethod.None;
+    let selectedTransport = DeployTransport.None;
 
     const jsx =
         <div className="ui grid stackable">
@@ -109,21 +102,21 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                 icon: "download",
                 className: "lightgrey focused",
                 onclick: () => {
-                    selectedTransport = UploadMethod.FileTransfer;
+                    selectedTransport = DeployTransport.FileTransfer;
                 }
             }, canUseWebHID() && {
                 label: lf("USB"),
                 icon: "usb",
                 className: "usb focused",
                 onclick: () => {
-                    selectedTransport = UploadMethod.UsbHid;
+                    selectedTransport = DeployTransport.UsbWebHid;
                 }
             }, canUseWebSerial() && {
                 label: lf("Bluetooth"),
                 icon: "bluetooth",
                 className: "bluetooth focused",
                 onclick: () => {
-                    selectedTransport = UploadMethod.Bluetooth;
+                    selectedTransport = DeployTransport.BluetoothWebSerial;
                 }
             }, docUrl && {
                 label: lf("Help"),
@@ -135,14 +128,14 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
         //timeout: 20000
     }).then(() => {
         switch (selectedTransport) {
-            case UploadMethod.FileTransfer:
+            case DeployTransport.FileTransfer:
                 pxt.tickEvent("upload.fileTransfer");
                 setUseFileTransfer();
 
                 return projectView.compile();
-            case UploadMethod.UsbHid:
+            case DeployTransport.UsbWebHid:
                 pxt.tickEvent("upload.usbhid");
-                setUseUsbHID();
+                setUseUsbWebHID();
 
                 return showUsbPairingDialogAsync()
                     .then(shouldContinue => {
@@ -157,7 +150,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
 
                     return projectView.compile();
                 });
-            case UploadMethod.Bluetooth:
+            case DeployTransport.BluetoothWebSerial:
                 pxt.tickEvent("upload.bluetooth");
                 setUseBluetoothWebSerial();
                 
@@ -390,7 +383,7 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
 export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTransport): Promise<void> {
     if (!confirmAsync) return Promise.resolve();
 
-    const isUsb = transportType === DeployTransport.UsbHid;
+    const isUsb = transportType === DeployTransport.UsbWebHid;
 
     return confirmAsync({
         header: lf("Could not connect to EV3"),

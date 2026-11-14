@@ -21,7 +21,7 @@ const rbfTemplate = `
 74617274696e672e2e2e0084006080XX00448581644886488405018130813e80427965210084000a
 `;
 
-let preferredTransport = DeployTransport.NotSelected;
+let preferredTransport = DeployTransport.None;
 
 export function canUseWebSerial(): boolean {
     return !!(navigator as any).serial;
@@ -35,8 +35,8 @@ export function setUseFileTransfer() {
     preferredTransport = DeployTransport.FileTransfer;
 }
 
-export function setUseUsbHID() {
-    preferredTransport = DeployTransport.UsbHid;
+export function setUseUsbWebHID() {
+    preferredTransport = DeployTransport.UsbWebHid;
 }
 
 export function setUseBluetoothWebSerial() {
@@ -48,12 +48,12 @@ export function getPreferredTransport(): DeployTransport {
 }
 
 export async function resetDeployTransport() {
-    preferredTransport = DeployTransport.NotSelected;
+    preferredTransport = DeployTransport.None;
     await transport.disconnectAsync(true);
 }
 
 export function isDeployTransportSelected(): boolean {
-    return preferredTransport !== DeployTransport.NotSelected;
+    return preferredTransport !== DeployTransport.None;
 }
 
 export async function deployCoreAsync(resp: pxtc.CompileResult) {
@@ -62,9 +62,9 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
     const filename = (resp.downloadFileBaseName || "pxt").replace(/^lego-/, "");
     const projectPxtJson = await (window as any).getPxtJson();
     const isFileTransfer = preferredTransport === DeployTransport.FileTransfer;
-    const isUsbHid = preferredTransport === DeployTransport.UsbHid;
+    const isUsbWebHid = preferredTransport === DeployTransport.UsbWebHid;
     const isWebSerial = preferredTransport === DeployTransport.BluetoothWebSerial;
-    const uploadProjectFolder = (isWebSerial || isUsbHid) && projectPxtJson?.uploadProjectFolder ? projectPxtJson.uploadProjectFolder : defaultUploadProjectFolder;
+    const uploadProjectFolder = (isWebSerial || isUsbWebHid) && projectPxtJson?.uploadProjectFolder ? projectPxtJson.uploadProjectFolder : defaultUploadProjectFolder;
 
     const fspath = `../prjs/${uploadProjectFolder}/`;
     // console.log(`fspath: ${fspath}`);
@@ -110,7 +110,7 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
     }
 
     // DIRECT FLASH MODE (WebSerial or WebHID)
-    const tickPrefix = isUsbHid ? "webhid" : "webserial";
+    const tickPrefix = isUsbWebHid ? "webhid" : "webserial";
     pxt.tickEvent(`${tickPrefix}.flash`);
     try {
         const wrapper = await transport.connectAsync(preferredTransport);
@@ -154,7 +154,7 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
             await resetDeployTransport();
             resetBluetoothPairingDialog();
             resetUsbPairingDialog();
-            console.warn(`${isUsbHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
+            console.warn(`${isUsbWebHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
             
             return;
         }
