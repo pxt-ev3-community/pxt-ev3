@@ -117,7 +117,7 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         
         let isEv3Connected = await wrapper.isEv3ConnectedAsync();
         if (!isEv3Connected) {
-            console.log("EV3 did not respond to PING, checking if app is running or attempting stop...");
+            pxt.log("EV3 did not respond to PING, checking if app is running or attempting stop...");
             await wrapper.tryStopRunningAppAsync();
             isEv3Connected = await wrapper.isEv3ConnectedAsync();
         }
@@ -131,8 +131,7 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         }
 
         try {
-            const ev3Name = await wrapper.getEv3NameAsync();
-            console.log(`Connected to EV3: ${ev3Name}`);
+            await wrapper.getEv3NameAsync();
         } catch (e) {
             console.warn("Failed to get EV3 name, continuing deployment.", e);
         }
@@ -141,7 +140,17 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         if (isPxtAppRunning) {
             await wrapper.stopAsync();
         }
-        await wrapper.rmAsync(elfPath); // Remove old file of the program
+        try {
+            await wrapper.rmAsync(elfPath); // Remove old file of the program
+        } catch (e) {
+            if (!isPxtAppRunning) {
+                pxt.log("rm failed, attempting stop and retry rm in case app was running...");
+                await wrapper.tryStopRunningAppAsync();
+                await wrapper.rmAsync(elfPath);
+            } else {
+                throw e;
+            }
+        }
         await wrapper.flashAsync(elfPath, UF2.readBytes(origElfUF2, 0, origElfUF2.length * 256));
         await wrapper.flashAsync(rbfPath, rbfBIN);
         await wrapper.runAsync(rbfPath);

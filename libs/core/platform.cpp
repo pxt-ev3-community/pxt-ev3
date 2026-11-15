@@ -15,22 +15,20 @@
 
 namespace pxt {
 
-#define USB_RFCOMM_MAGIC 0x3d3f
-#define USB_SERIAL 1
-#define USB_RESTART 2
-#define USB_DMESG 3
+#define CMD_PXT_MAGIC 0x3d3f // Magic signature identifying custom MakeCode (PXT) packets
+#define CMD_SERIAL 1 // Stream console.log / serial data from robot to editor
+#define CMD_STOP 2 // Stop currently running PXT program and resume LMS2012
+#define CMD_DMESG 3 // Request dump of runtime debug log (dmesg) buffer
+#define CMD_PING 4 // Healthcheck ping: check if PXT app is currently running
 
-#define RFCOMM_PING 3
-#define RFCOMM_STOP 2
+#define EV3_AF_BLUETOOTH 31 // Linux socket address family for Bluetooth (AF_BLUETOOTH)
 
-#define EV3_AF_BLUETOOTH 31
+#define VM_BRICK_NAME_SIZE 120 // Maximum size of the EV3 brick name in LMS2012 VM memory
 
-#define VM_BRICK_NAME_SIZE 120
-
-int lmsPid;
+int lmsPid; // Process ID of the LEGO LMS2012 firmware, paused (SIGSTOP) during PXT execution
 static pthread_t mainThreadId; // Main JavaScript user execution thread ID
 
-static int usbFD;
+static int usbFD; // File descriptor of /dev/lms_usbdev for USB HID host communication
 static int rfcommFD = -1; // Connected RFCOMM socket shared with LMS2012
 
 static const char *progPath = "/mnt/ramdisk/prjs/BrkProg_SAVE";
@@ -236,18 +234,19 @@ static void handlePacket(const uint8_t *packet, int totalLen, int outFd, bool is
         return;
     }
 
-    // Custom commands (USB_RFCOMM_MAGIC = 0x3d3f)
-    if (totalLen >= 8 && packet[4] == (USB_RFCOMM_MAGIC & 0xff) && packet[5] == ((USB_RFCOMM_MAGIC >> 8) & 0xff)) {
+    // Custom commands (CMD_PXT_MAGIC = 0x3d3f)
+    if (totalLen >= 8 && packet[4] == (CMD_PXT_MAGIC & 0xff) && packet[5] == ((CMD_PXT_MAGIC >> 8) & 0xff)) {
         uint16_t code = packet[6] | (packet[7] << 8);
         DMESG("CUSTOM PACKET msgcount=%04x magic=3d3f code=%04x isUsb=%d", msgcount, code, isUsb);
 
-        if (code == RFCOMM_STOP) {
+        if (code == CMD_STOP) {
             sendSystemReply(outFd, isUsb, msgcount, 2, 0);
             sleep_core_us(10000);
             target_reset();
-        } else if (code == RFCOMM_PING) {
-            if (isUsb) dumpDmesg();
-            sendSystemReply(outFd, isUsb, msgcount, 3, 0);
+        } else if (code == CMD_DMESG) {
+            dumpDmesg();
+        } else if (code == CMD_PING) {
+            sendSystemReply(outFd, isUsb, msgcount, 4, 0);
         }
 
         return;
@@ -304,7 +303,7 @@ void sendUsb(uint16_t code, const char *data, int len) {
         if (sz > 1000) {
             sz = 1000;
         }
-        UsbPacket pkt = {(uint16_t)(6 + sz), 0, USB_RFCOMM_MAGIC, code, {}};
+        UsbPacket pkt = {(uint16_t)(6 + sz), 0, CMD_PXT_MAGIC, code, {}};
         memcpy(pkt.buf, data, sz);
         pthread_mutex_lock(&usbWriteMutex);
         write(usbFD, &pkt, sizeof(pkt));
@@ -315,7 +314,7 @@ void sendUsb(uint16_t code, const char *data, int len) {
 }
 
 void sendSerial(const char *data, int len) {
-    sendUsb(USB_SERIAL, data, len);
+    sendUsb(CMD_SERIAL, data, len);
 }
 
 
@@ -508,7 +507,9 @@ void target_startup() {
 }
 
 
-void initKeys() {}
+void initKeys() {
+    // Pass - handled by exitThread
+}
 
 // These are disabled except when building File_manager.pdf
 // %
