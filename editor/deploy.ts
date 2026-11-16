@@ -6,7 +6,13 @@ import UF2 = pxtc.UF2;
 
 import { transport, DeployTransport } from "./transport";
 import { WebHidIO } from "./webhid";
-import { resetBluetoothPairingDialog, resetUsbPairingDialog, showEv3ConnectionFailedDialogAsync } from "./dialogs";
+import { Ev3Wrapper } from "./wrap";
+import { 
+    ConnectionFailedAction, 
+    resetBluetoothPairingDialog, 
+    resetUsbPairingDialog, 
+    showEv3ConnectionFailedDialogAsync 
+} from "./dialogs";
 
 
 export { DeployTransport };
@@ -56,7 +62,7 @@ export function isDeployTransportSelected(): boolean {
     return preferredTransport !== DeployTransport.None;
 }
 
-export async function deployCoreAsync(resp: pxtc.CompileResult) {
+export async function deployCoreAsync(resp: pxtc.CompileResult): Promise<void> {
     console.log(`START DEPLOY`);
 
     const filename = (resp.downloadFileBaseName || "pxt").replace(/^lego-/, "");
@@ -113,7 +119,28 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
     const tickPrefix = isUsbWebHid ? "webhid" : "webserial";
     pxt.tickEvent(`${tickPrefix}.flash`);
     try {
-        const wrapper = await transport.connectAsync(preferredTransport);
+        let wrapper: Ev3Wrapper;
+        try {
+            wrapper = await transport.connectAsync(preferredTransport);
+        } catch (connErr: any) {
+            if (connErr?.message === "NO_PORT_SELECTED" || connErr?.message === "NO_DEVICE_SELECTED") {
+                await resetDeployTransport();
+                resetBluetoothPairingDialog();
+                resetUsbPairingDialog();
+                console.warn(`${isUsbWebHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
+                return;
+            }
+            console.warn("Connection attempt failed:", connErr);
+            const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
+            if (action === ConnectionFailedAction.Retry) {
+                return deployCoreAsync(resp);
+            }
+            if (action === ConnectionFailedAction.ReselectDevice) {
+                await transport.disconnectAsync(true);
+                return deployCoreAsync(resp);
+            }
+            return;
+        }
         
         let isEv3Connected = await wrapper.isEv3ConnectedAsync();
         if (!isEv3Connected) {
@@ -125,8 +152,14 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         if (!isEv3Connected) {
             console.warn("EV3 is not responding.");
             await transport.disconnectAsync(true);
-            await showEv3ConnectionFailedDialogAsync(preferredTransport);
-
+            const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
+            if (action === ConnectionFailedAction.Retry) {
+                return deployCoreAsync(resp);
+            }
+            if (action === ConnectionFailedAction.ReselectDevice) {
+                await transport.disconnectAsync(true);
+                return deployCoreAsync(resp);
+            }
             return;
         }
 

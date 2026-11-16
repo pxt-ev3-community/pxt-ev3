@@ -40,19 +40,22 @@ const opComGet = 0xD3; // System command: Get
 const getBrickName = 0x0D; // GET subcode Get brick name
 
 
+let activeLogTag = "EV3";
+
 function log(msg: string) {
-    pxt.log("SERIAL: " + msg);
+    pxt.log(`${activeLogTag}: ${msg}`);
 }
 
 
 export class Ev3Wrapper {
+    
     msgs = new U.PromiseBuffer<Uint8Array>()
     private cmdSeq = U.randomUint32() & 0xffff;
     private lock = new U.PromiseQueue();
     isStreaming = false;
     dataDump = /talkdbg=1/.test(window.location.href);
-
-    constructor(public io: pxt.packetio.PacketIO) {
+    constructor(public io: pxt.packetio.PacketIO, private tag: string = "EV3") {
+        activeLogTag = this.tag;
         io.onData = buf => {
             buf = buf.slice(0, HF2.read16(buf, 0) + 2);
             if (HF2.read16(buf, 4) == cmdPxtMagic) {
@@ -196,7 +199,7 @@ export class Ev3Wrapper {
     }
 
     dmesgAsync() {
-        log(`asking for DMESG buffer over serial`);
+        log(`asking for DMESG buffer`);
         let buf = this.allocCustom(cmdDmesg);
 
         return this.justSendAsync(buf);

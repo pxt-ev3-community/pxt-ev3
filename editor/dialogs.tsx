@@ -12,8 +12,13 @@ import {
 import { projectView } from "./extension";
 
 
+export enum ConnectionFailedAction {
+    Cancel,
+    Retry,
+    ReselectDevice
+}
+
 let skipFileTransferDialog = false;
-let skipUsbPairingDialog = false;
 let skipBluetoothPairingDialog = false;
 
 let confirmAsync: (options: any) => Promise<number>;
@@ -27,7 +32,7 @@ export function resetFileTransferDialog() {
 }
 
 export function resetUsbPairingDialog() {
-    skipUsbPairingDialog = false;
+    // Kept for interface compatibility
 }
 
 export function resetBluetoothPairingDialog() {
@@ -322,7 +327,7 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
 }
 
 export async function showUsbPairingDialogAsync(): Promise<boolean> {
-    if (!confirmAsync || skipUsbPairingDialog) return Promise.resolve(true);
+    if (!confirmAsync) return Promise.resolve(true);
 
     const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
 
@@ -331,15 +336,6 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
             <p>{lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}</p>
             <p>{lf("Connect your EV3 to your computer with a USB cable and make sure the brick is turned on.")}</p>
             <p>{lf("When prompted by the browser, select 'Xfer data to and from EV3 brick' and click 'Connect'.")}</p>
-            <div className="ui toggle checkbox">
-                <input
-                    type="checkbox"
-                    onChange={e => {
-                        skipUsbPairingDialog = e.currentTarget.checked;
-                    }}
-                />
-                <label>{lf("Don't show this again")}</label>
-            </div>
         </div>
     );
 
@@ -398,34 +394,52 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     }).then(result => result === 1);
 }
 
-export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTransport): Promise<void> {
-    if (!confirmAsync) return Promise.resolve();
+export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTransport): Promise<ConnectionFailedAction> {
+    if (!confirmAsync) return Promise.resolve(ConnectionFailedAction.Cancel);
 
     const isUsb = transportType === DeployTransport.UsbWebHid;
+    let selectedAction = ConnectionFailedAction.Cancel;
 
     return confirmAsync({
         header: lf("Could not connect to EV3"),
         hasCloseIcon: true,
         hideCancel: true,
         hideAgree: false,
-        agreeLbl: lf("OK"),
+        agreeLbl: lf("Retry"),
+        agreeIcon: "repeat",
         jsx: (
             <div>
                 {isUsb ? (
                     <div>
-                        <p>{lf("The selected USB device did not respond as an EV3 device.")}</p>
-                        <p>{lf("Make sure your EV3 is turned on and connected to your computer with a USB cable, then try again.")}</p>
+                        <p>{lf("EV3 was not found or is still connecting.")}</p>
+                        <p>{lf("Make sure your EV3 is turned on and connected to your computer with a USB cable. Windows may take a few seconds to recognize the device.")}</p>
                     </div>
                 ) : (
                     <div>
-                        <p>{lf("The selected serial port did not respond as an EV3 device.")}</p>
+                        <p>{lf("EV3 was not found or is still connecting.")}</p>
                         <p>{lf("Make sure your EV3 is turned on and paired with your computer, then select the correct Bluetooth serial port and try again.")}</p>
                     </div>
                 )}
             </div>
-        )
-    }).then(() => {
-        // Pass
+        ),
+        buttons: [
+            {
+                label: lf("Reselect device"),
+                icon: "exchange",
+                className: "lightgrey",
+                onclick: () => {
+                    selectedAction = ConnectionFailedAction.ReselectDevice;
+                }
+            }
+        ]
+    }).then(result => {
+        if (selectedAction === ConnectionFailedAction.ReselectDevice) {
+            return ConnectionFailedAction.ReselectDevice;
+        }
+        if (result === 1) {
+            return ConnectionFailedAction.Retry;
+        }
+        return ConnectionFailedAction.Cancel;
     });
 }
 

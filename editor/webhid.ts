@@ -9,6 +9,7 @@ enum IOState {
 }
 
 export class WebHidIO implements pxt.packetio.PacketIO {
+    
     onData = (v: Uint8Array) => {};
     onEvent = (v: Uint8Array) => {};
     onError = (e: Error) => {};
@@ -30,6 +31,36 @@ export class WebHidIO implements pxt.packetio.PacketIO {
         return typeof navigator !== "undefined" && !!(navigator as any).hid;
     }
 
+    private static getFilters(): any[] {
+        const serial = pxt.appTarget?.serial;
+        const vendorId = serial?.vendorId ? parseInt(serial.vendorId, 16) : undefined;
+        const productId = serial?.productId ? parseInt(serial.productId, 16) : undefined;
+
+        if (vendorId !== undefined) {
+            const filter: any = { vendorId };
+            if (productId !== undefined) {
+                filter.productId = productId;
+            }
+            return [filter];
+        }
+        return [{}];
+    }
+
+    private static findDevice(devices: any[]): any {
+        if (!devices || devices.length === 0) return null;
+        const serial = pxt.appTarget?.serial;
+        const vendorId = serial?.vendorId ? parseInt(serial.vendorId, 16) : undefined;
+        const productId = serial?.productId ? parseInt(serial.productId, 16) : undefined;
+
+        if (vendorId !== undefined) {
+            const match = devices.find((d: any) =>
+                d.vendorId === vendorId && (productId === undefined || d.productId === productId)
+            );
+            if (match) return match;
+        }
+        return devices[0];
+    }
+
     isConnected() {
         return this.state === IOState.Connected && !!this.device?.opened;
     }
@@ -43,22 +74,19 @@ export class WebHidIO implements pxt.packetio.PacketIO {
         if (!hid) throw new Error("WEBHID_NOT_SUPPORTED");
 
         let device: any;
-        // Read vendorId and productId directly from pxtarget.json ("serial" configuration)
-        const vendorId = parseInt(pxt.appTarget.serial.vendorId, 16);
-        const productId = parseInt(pxt.appTarget.serial.productId, 16);
 
         if (!forceRequest) {
             const devices = await hid.getDevices();
-            if (devices && devices.length > 0) {
-                // Find EV3 device or take first approved device
-                device = devices.find((d: any) => d.vendorId === vendorId && (!d.productId || d.productId === productId)) || devices[0];
+            device = WebHidIO.findDevice(devices);
+            if (!device) {
+                throw new Error("NO_DEVICE_CONNECTED");
             }
         }
 
         if (!device) {
             try {
                 const devices = await hid.requestDevice({
-                    filters: [{ vendorId, productId }]
+                    filters: WebHidIO.getFilters()
                 });
                 if (devices && devices.length > 0) {
                     device = devices[0];
@@ -88,12 +116,25 @@ export class WebHidIO implements pxt.packetio.PacketIO {
         this.state = IOState.Connecting;
 
         try {
+            const hid = (navigator as any).hid;
+            // If the device is not opened (or was disconnected/re-plugged), refresh from hid.getDevices()
+            if (hid && (!this.device || !this.device.opened)) {
+                const devices = await hid.getDevices();
+                const matched = WebHidIO.findDevice(devices);
+                if (matched) {
+                    this.device = matched;
+                }
+            }
+
+            if (!this.device) {
+                throw new Error("NO_DEVICE_CONNECTED");
+            }
+
             if (!this.device.opened) {
                 await this.device.open();
             }
             this.state = IOState.Connected;
 
-            const hid = (navigator as any).hid;
             if (hid) {
                 hid.removeEventListener("disconnect", this.onDisconnectBound);
                 hid.addEventListener("disconnect", this.onDisconnectBound);
@@ -155,7 +196,7 @@ export class WebHidIO implements pxt.packetio.PacketIO {
     }
 
     private handleDisconnect(event: any) {
-        if (event?.device === this.device) {
+        if (!event?.device || event.device === this.device) {
             console.log("HID: EV3 device disconnected");
             this.disconnectAsync();
         }

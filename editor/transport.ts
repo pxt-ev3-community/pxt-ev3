@@ -40,7 +40,13 @@ class TransportManager {
      * If another connection attempt is already in progress, the same Promise is returned instead of starting a second connection.
      */
     async connectAsync(transportType: DeployTransport = DeployTransport.BluetoothWebSerial): Promise<Ev3Wrapper> {
-        if (this.state === TransportState.Connected && this.wrapper && this.currentType === transportType) {
+        if (
+            this.state === TransportState.Connected && 
+            this.wrapper && 
+            this.currentType === transportType && 
+            this.io && 
+            (this.io as any).isConnected?.()
+        ) {
             return this.wrapper; // Already connected
         }
         if (this.connectPromise) return this.connectPromise; // If a connection is already in progress, we return the same Promise
@@ -70,13 +76,32 @@ class TransportManager {
             if (this.currentType !== transportType && this.io) {
                 try {
                     await this.io.disconnectAsync();
-                } catch {}
+                } catch {
+                    // Pass
+                }
                 this.io = undefined;
                 this.wrapper = undefined;
                 this.state = TransportState.Unpaired;
             }
 
             this.currentType = transportType;
+
+            // If an existing IO is disconnected, try reconnecting it; if reconnect fails, discard it
+            if (this.io && !(this.io as any).isConnected?.()) {
+                try {
+                    this.state = TransportState.Connecting;
+                    await this.io.reconnectAsync();
+                } catch (reconnectErr) {
+                    console.log("IO reconnect failed, creating fresh IO instance...", reconnectErr);
+                    try {
+                        await this.io.disconnectAsync();
+                    } catch {
+                        // Pass
+                    }
+                    this.io = undefined;
+                    this.wrapper = undefined;
+                }
+            }
 
             // Don't create a new IO if it already exists
             if (!this.io) {
@@ -88,12 +113,24 @@ class TransportManager {
                 } else {
                     throw new Error("UNSUPPORTED_TRANSPORT");
                 }
+
+                // Bind connection state changes
+                const currentIo = this.io;
+                currentIo.onConnectionChanged = () => {
+                    if (this.io === currentIo && !(currentIo as any).isConnected?.()) {
+                        if (this.state === TransportState.Connected) {
+                            this.state = TransportState.Idle;
+                        }
+                    }
+                };
+
+                this.state = TransportState.Connecting;
+                await this.io.reconnectAsync();
             }
 
-            this.state = TransportState.Connecting;
-            await this.io.reconnectAsync();
             if (!this.wrapper) { // If the wrapper is not yet available, create it
-                this.wrapper = new Ev3Wrapper(this.io);
+                const tag = transportType === DeployTransport.UsbWebHid ? "HID" : "SERIAL";
+                this.wrapper = new Ev3Wrapper(this.io, tag);
             }
 
             this.state = TransportState.Connected;
@@ -108,6 +145,10 @@ class TransportManager {
                 this.state = TransportState.Unpaired;
                 throw e;
             }
+            if (e?.message === "NO_DEVICE_CONNECTED") {
+                this.state = TransportState.Idle;
+                throw e;
+            }
             if (e?.message === "PORT_PERMISSION_DENIED" || e?.message === "DEVICE_PERMISSION_DENIED") {
                 this.state = TransportState.Idle;
                 throw e;
@@ -118,7 +159,9 @@ class TransportManager {
                 if (this.io) { // Destroy the old IO if it exists
                     try {
                         await this.io.disconnectAsync();
-                    } catch {}
+                    } catch {
+                        // Pass
+                    }
                     this.io = undefined;
                     this.wrapper = undefined;
                 }
@@ -156,7 +199,6 @@ class TransportManager {
             this.state = unpaired ? TransportState.Unpaired : TransportState.Idle;
         }
     }
-
 }
 
 export const transport = new TransportManager();
