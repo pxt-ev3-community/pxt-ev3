@@ -205,104 +205,68 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
     if (!confirmAsync || skipFileTransferDialog) return Promise.resolve();
 
     const jsx = (
-        <div className="ui grid stackable">
-            <div className="column five wide download-hint">
-                <div className="ui header">
-                    {lf("First time here?")}
-                </div>
-
-                <strong style={{ fontSize: "small" }}>
-                    {lf("You must have version 1.10E or above of the firmware")}
-                </strong>
-
-                <div style={{
-                    justifyContent: "center",
-                    display: "flex",
-                    padding: "1rem"
-                }}>
+        <div className="ui two column grid stackable" style={{ padding: "0.5rem 0.5rem 0" }}>
+            <div className="column">
+                <div style={{ textAlign: "center", marginBottom: "1rem" }}>
                     <img
-                        className="ui image"
-                        src="/static/download/firmware.png"
-                        style={{ height: "100px" }}
+                        className="ui medium rounded image"
+                        src="/static/download/connect.svg"
+                        style={{
+                            height: "109px",
+                            width: "261px",
+                            display: "inline-block"
+                        }}
                     />
                 </div>
 
-                <a href="/troubleshoot" target="_blank">
-                    {lf("Check your firmware version here and update if needed")}
-                </a>
+                <div style={{ display: "flex", alignItems: "flex-start" }}>
+                    <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.1em" }}>1</span>
+                    <div>
+                        <strong>
+                            {lf("Connect the EV3 to your computer with a USB cable")}
+                        </strong>
+                        <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                            {lf("Use the miniUSB port on the top of the EV3 Brick")}
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div className="column eleven wide">
-                <div className="ui two column grid padded">
-                    <div className="column">
-                        <div className="ui">
-                            <div className="image">
-                                <img
-                                    className="ui medium rounded image"
-                                    src="/static/download/connect.svg"
-                                    style={{
-                                        height: "109px",
-                                        width: "261px",
-                                        marginBottom: "1rem"
-                                    }}
-                                />
-                            </div>
+            <div className="column">
+                <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                    <img
+                        className="ui medium rounded image"
+                        src="/static/download/transfer.svg"
+                        style={{
+                            height: "109px",
+                            width: "261px",
+                            display: "inline-block"
+                        }}
+                    />
+                </div>
 
-                            <div className="content">
-                                <div className="description">
-                                    <span className="ui yellow circular label">1</span>
-                                    <strong>
-                                        {lf("Connect the EV3 to your computer with a USB cable")}
-                                    </strong>
-                                    <br />
-                                    <span style={{ fontSize: "small" }}>
-                                        {lf("Use the miniUSB port on the top of the EV3 Brick")}
-                                    </span>
-                                </div>
-                            </div>
+                <div style={{ display: "flex", alignItems: "flex-start" }}>
+                    <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.1em" }}>2</span>
+                    <div>
+                        <strong>
+                            {lf("Move the .uf2 file to the EV3 Brick")}
+                        </strong>
+                        <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                            {lf("Locate the downloaded .uf2 file and drag it to the EV3 USB drive")}
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div className="column">
-                        <div className="ui">
-                            <div className="image">
-                                <img
-                                    className="ui medium rounded image"
-                                    src="/static/download/transfer.svg"
-                                    style={{
-                                        height: "109px",
-                                        width: "261px",
-                                        marginBottom: "1rem"
-                                    }}
-                                />
-                            </div>
-
-                            <div className="content">
-                                <div className="description">
-                                    <span className="ui yellow circular label">2</span>
-                                    <strong>
-                                        {lf("Move the .uf2 file to the EV3 Brick")}
-                                    </strong>
-                                    <br />
-                                    <span style={{ fontSize: "small" }}>
-                                        {lf("Locate the downloaded .uf2 file and drag it to the EV3 USB drive")}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="sixteen wide column" style={{ paddingTop: 0 }}>
-                        <div className="ui toggle checkbox">
-                            <input
-                                type="checkbox"
-                                onChange={e => {
-                                    skipFileTransferDialog = e.currentTarget.checked;
-                                }}
-                            />
-                            <label>{lf("Don't show this again")}</label>
-                        </div>
-                    </div>
+            <div className="sixteen wide column" style={{ paddingTop: "1.25rem" }}>
+                <div className="ui toggle checkbox">
+                    <input
+                        type="checkbox"
+                        onChange={e => {
+                            skipFileTransferDialog = e.currentTarget.checked;
+                        }}
+                    />
+                    <label>{lf("Don't show this again")}</label>
                 </div>
             </div>
         </div>
