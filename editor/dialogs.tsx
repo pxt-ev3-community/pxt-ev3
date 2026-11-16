@@ -96,15 +96,20 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                     </div>
                     <div className="row">
                         <div className="sixteen wide column">
-                            <div className="download-step">
-                                <span className="ui orange circular label">*</span>
-                                <div className="download-step-content">
-                                    <strong>{lf("Note")}</strong>
-                                    <ul className="ui bulleted list">
-                                        <li>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</li>
-                                        <li>{lf("USB and Bluetooth allow uploading to a custom folder specified in project settings.")}</li>
-                                    </ul>
+                            <div className="ui info message" style={{
+                                backgroundColor: "#f8f9fa",
+                                boxShadow: "inset 0 0 0 1px #dcdcdc",
+                                color: "var(--pxt-neutral-foreground1, #5e5e5e)",
+                                margin: "0.25rem 0 0 0",
+                                padding: "0.75rem 1rem"
+                            }}>
+                                <div className="header" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", marginBottom: "0.35rem" }}>
+                                    {lf("Note")}
                                 </div>
+                                <ul className="ui bulleted list" style={{ margin: "0.25rem 0 0 1.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                                    <li>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</li>
+                                    <li>{lf("USB and Bluetooth allow uploading to a custom folder specified in project settings.")}</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
