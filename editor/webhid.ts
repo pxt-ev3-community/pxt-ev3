@@ -32,6 +32,26 @@ export class WebHidIO implements pxt.packetio.PacketIO {
     }
 
     private static getFilters(): any[] {
+        // 1. Check compile.hidSelectors (standard MakeCode WebHID configuration)
+        const selectors = pxt.appTarget?.compile?.hidSelectors;
+        if (selectors && selectors.length > 0) {
+            const filters: any[] = [];
+            for (const s of selectors) {
+                const f: any = {};
+                if (s.vid) f.vendorId = parseInt(s.vid, 16);
+                if (s.pid) f.productId = parseInt(s.pid, 16);
+                if (s.usagePage) f.usagePage = parseInt(s.usagePage, 16);
+                if (s.usageId) f.usage = parseInt(s.usageId, 16);
+                if (Object.keys(f).length > 0) {
+                    filters.push(f);
+                }
+            }
+            if (filters.length > 0) {
+                return filters;
+            }
+        }
+
+        // 2. Fallback to serial.vendorId / productId
         const serial = pxt.appTarget?.serial;
         const vendorId = serial?.vendorId ? parseInt(serial.vendorId, 16) : undefined;
         const productId = serial?.productId ? parseInt(serial.productId, 16) : undefined;
@@ -48,6 +68,23 @@ export class WebHidIO implements pxt.packetio.PacketIO {
 
     private static findDevice(devices: any[]): any {
         if (!devices || devices.length === 0) return null;
+
+        // 1. Check compile.hidSelectors
+        const selectors = pxt.appTarget?.compile?.hidSelectors;
+        if (selectors && selectors.length > 0) {
+            for (const s of selectors) {
+                const vid = s.vid ? parseInt(s.vid, 16) : undefined;
+                const pid = s.pid ? parseInt(s.pid, 16) : undefined;
+                if (vid !== undefined) {
+                    const match = devices.find((d: any) =>
+                        d.vendorId === vid && (pid === undefined || d.productId === pid)
+                    );
+                    if (match) return match;
+                }
+            }
+        }
+
+        // 2. Fallback to serial.vendorId / productId
         const serial = pxt.appTarget?.serial;
         const vendorId = serial?.vendorId ? parseInt(serial.vendorId, 16) : undefined;
         const productId = serial?.productId ? parseInt(serial.productId, 16) : undefined;
