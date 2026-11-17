@@ -102,7 +102,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                                 <span className="ui yellow circular label">2</span>
                                 <div className="download-step-content">
                                     <strong>{lf("USB")}</strong>
-                                    <p>{lf("Upload the program directly to your EV3 over a USB cable connection using WebHID.")}</p>
+                                    <p>{lf("Upload the program directly to your EV3 over a USB cable connection using 'WebHID'.")}</p>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +113,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                                 <span className="ui yellow circular label">3</span>
                                 <div className="download-step-content">
                                     <strong>{lf("Bluetooth")}</strong>
-                                    <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using Web Serial.")}</p>
+                                    <p>{lf("Upload the program directly to your EV3 over a Bluetooth connection using 'Web Serial'.")}</p>
                                 </div>
                             </div>
                         </div>
@@ -324,8 +324,13 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
 
     const jsx = (
         <div style={{ padding: "0.25rem 0" }}>
-            <p style={{ marginBottom: "1rem" }}>
-                {lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}
+            <p style={{ marginBottom: "1.2rem" }}>
+                {jsxLF(
+                    lf("USB download uses {0}. Your browser will ask for permission to connect to your EV3 brick."),
+                    <strong>'WebHID'</strong>
+                )}
+                <br />
+                {lf("This is the fastest download method with speeds around 130–230 KB/s.")}
             </p>
 
             <div className="ui two column grid stackable" style={{ alignItems: "center" }}>
@@ -349,7 +354,9 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                             <strong>{lf("Connect EV3 brick")}</strong>
                             <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                                 {jsxLF(
-                                    lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected, {0} appears next to the battery icon on the brick screen."),
+                                    lf("Connect the {0} cable to the {1} port on top of the EV3 and make sure the brick is turned on. When connected, {2} appears next to the battery icon on the brick screen."),
+                                    <strong>'miniUSB'</strong>,
+                                    <strong>'PC'</strong>,
                                     <strong>'USB'</strong>
                                 )}
                             </div>
@@ -426,7 +433,12 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     const jsx = (
         <div style={{ padding: "0.25rem 0" }}>
             <p style={{ marginBottom: "1.2rem" }}>
-                {lf("Bluetooth download uses Web Serial. Your browser will ask you to select a serial port.")}
+                {jsxLF(
+                    lf("Bluetooth download uses {0}. Your browser will ask you to select a serial port."),
+                    <strong>'Web Serial'</strong>
+                )}
+                <br />
+                {lf("Download speed is around 30–40 KB/s, which is slower than 'USB WebHID'.")}
             </p>
 
             <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
@@ -445,7 +457,7 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                     <strong>{lf("Close conflicting apps and pop-ups")}</strong>
                     <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                         {jsxLF(
-                            lf("Close applications that may be using the Bluetooth connection, such as {0}, {1}, or other editor tabs (BrickCode). If {2} or other apps (e.g., {3}) are open on the EV3 brick, close them before downloading."),
+                            lf("Close applications that may be using the Bluetooth connection, such as {0}, {1}, or other BrickCode tabs. If {2} or other apps (e.g., {3}) are open on the EV3 brick, close them before downloading."),
                             <strong>'EV3 Lab'</strong>,
                             <strong>'EV3 Classroom'</strong>,
                             <strong>'Port View'</strong>,
@@ -554,7 +566,11 @@ export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTranspo
                             <div>
                                 <strong>{lf("Check the cable")}</strong>
                                 <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
-                                    {lf("Make sure the miniUSB cable is firmly plugged into the PC port on the top of the EV3 and into your computer.")}
+                                    {jsxLF(
+                                        lf("Make sure the {0} cable is firmly plugged into the {1} port on the top of the EV3 and into your computer."),
+                                        <strong>'miniUSB'</strong>,
+                                        <strong>'PC'</strong>
+                                    )}
                                 </div>
                             </div>
                         </div>
