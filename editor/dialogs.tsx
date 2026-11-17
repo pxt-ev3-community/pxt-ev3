@@ -315,6 +315,9 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                             <div style={{ marginTop: "0.25rem" }}>
                                 {lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected,")} <strong>'USB'</strong> {lf("appears next to the battery icon on the brick screen.")}
                             </div>
+                            <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                                {lf("If")} <strong>'Port View'</strong> {lf("or other apps (e.g.,")} <strong>'Motor Control'</strong>{lf(") are open on the EV3, close them before downloading.")}
+                            </div>
                         </div>
                     </div>
 
@@ -372,35 +375,76 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
     if (!confirmAsync || skipBluetoothPairingDialog) return Promise.resolve(true);
 
     const jsx = (
-        <div>
-            <p>{lf("Bluetooth download uses Web Serial. Your browser will ask you to select a serial port.")}</p>
-            <p>{lf("Before continuing, make sure your EV3 is turned on and already paired with your computer. Close other applications that may be using the EV3 Bluetooth connection, such as 'EV3 Lab', 'EV3 Classroom', other BrickCode (MakeCode) editor tabs, or other applications using the EV3 Bluetooth serial connection.")}</p>
-            <p>{lf("If 'Port View' is open on the EV3, close it before downloading. The program may download successfully, but it will not start.")}</p>
-            <p>{lf("When the browser asks you to select a serial port, select the port with the name of your EV3. This is the name you set on your EV3 controller.")}</p>
-            {pxt.BrowserUtils.isWindows() && (
-                <p>{lf("On some Windows computers, the browser may not display your EV3 by name. The exact cause of this issue has not yet been determined. In this case, select the outgoing Bluetooth COM port assigned to your EV3. You can check the Bluetooth settings and open the COM Ports tab to identify the ports assigned to your EV3.")}</p>
-            )}
-            <p>{lf("Do not select unrelated COM ports, USB devices, or serial ports belonging to other hardware. If the EV3 does not respond after selecting a port, try selecting a different Bluetooth serial port.")}</p>
-            <p style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                <i className="info circle icon" /> {lf("Bluetooth allows uploading to a custom folder specified in 'Project Settings'.")}
+        <div style={{ padding: "0.25rem 0" }}>
+            <p style={{ marginBottom: "1.2rem" }}>
+                {lf("Bluetooth download uses Web Serial. Your browser will ask you to select a serial port.")}
             </p>
-            <div className="ui toggle checkbox">
-                <input
-                    type="checkbox"
-                    onChange={e => {
-                        skipBluetoothPairingDialog = e.currentTarget.checked;
-                    }}
-                />
-                <label>{lf("Don't show this again")}</label>
+
+            <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
+                <div>
+                    <strong>{lf("Turn on and pair EV3")}</strong>
+                    <div style={{ marginTop: "0.25rem" }}>
+                        {lf("Make sure your EV3 is turned on and already paired with your computer in Bluetooth settings.")}
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
+                <div>
+                    <strong>{lf("Close conflicting apps")}</strong>
+                    <div style={{ marginTop: "0.25rem" }}>
+                        {lf("Close applications that may be using the Bluetooth connection, such as")} <strong>'EV3 Lab'</strong>, <strong>'EV3 Classroom'</strong>, {lf("or other editor tabs (BrickCode). If")} <strong>'Port View'</strong> {lf("or other apps (e.g.,")} <strong>'Motor Control'</strong>{lf(") are open on the EV3 brick, close them before downloading.")}
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>3</span>
+                <div>
+                    <strong>{lf("Select EV3 port in browser")}</strong>
+                    <div style={{ marginTop: "0.25rem" }}>
+                        {lf("When prompted by the browser, select the serial port with the name of your EV3.")}
+                    </div>
+                    {pxt.BrowserUtils.isWindows() && (
+                        <div style={{ marginTop: "0.35rem", fontSize: "14px", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                            {lf("On Windows, if your EV3 name is not shown, select the outgoing Bluetooth COM port assigned to your EV3 in Bluetooth COM Ports settings.")}
+                        </div>
+                    )}
+                    <div style={{ marginTop: "0.35rem", fontSize: "14px", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                        {lf("Do not select unrelated COM ports or USB devices. If the EV3 does not respond, try selecting a different Bluetooth serial port.")}
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ marginTop: "1.5rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                <i className="info circle icon" /> {lf("Bluetooth allows uploading to a custom folder specified in 'Project Settings'.")}
+            </div>
+
+            <div style={{ marginTop: "1.5rem" }}>
+                <div className="ui toggle checkbox">
+                    <input
+                        type="checkbox"
+                        onChange={e => {
+                            skipBluetoothPairingDialog = e.currentTarget.checked;
+                        }}
+                    />
+                    <label>{lf("Don't show this again")}</label>
+                </div>
             </div>
         </div>
     );
     
     return confirmAsync({
-        header: lf("Bluetooth pairing"),
+        header: lf("Bluetooth Web Serial connection"),
         jsx,
         hasCloseIcon: true,
         hideCancel: true,
+        hideAgree: false,
+        agreeLbl: lf("Connect"),
+        agreeIcon: "bluetooth",
+        className: "downloaddialog",
         buttons: [{
             label: lf("Help"),
             icon: "question circle",
