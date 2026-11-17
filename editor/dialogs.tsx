@@ -322,8 +322,6 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
 export async function showUsbPairingDialogAsync(): Promise<boolean> {
     if (!confirmAsync || skipUsbPairingDialog) return Promise.resolve(true);
 
-    const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
-
     const jsx = (
         <div style={{ padding: "0.25rem 0" }}>
             <p style={{ marginBottom: "1.2rem" }}>
@@ -419,14 +417,12 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
         agreeLbl: lf("Connect"),
         agreeIcon: "usb",
         className: "downloaddialog",
-        buttons: [
-            docUrl && {
-                label: lf("Help"),
-                icon: "question circle",
-                className: "lightgrey",
-                url: docUrl
-            }
-        ].filter(Boolean)
+        buttons: [{
+            label: lf("Help"),
+            icon: "question circle",
+            className: "lightgrey",
+            url: pxt.appTarget.appTheme.usbDocs || "/usb"
+        }]
     }).then(result => result === 1);
 }
 

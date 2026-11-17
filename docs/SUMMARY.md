@@ -4,6 +4,7 @@
 
 * [Troubleshoot](/troubleshoot)
 * [EV3 Manager](https://ev3manager.education.lego.com/)
+* [USB WebHID](/usb)
 * [Bluetooth](/bluetooth)
 * [Forum](https://forum.makecode.com)
 * [LEGO Support](https://www.lego.com/service/)
