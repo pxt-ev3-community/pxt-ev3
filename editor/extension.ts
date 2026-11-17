@@ -9,6 +9,7 @@ import {
     setConfirmAsync, 
     resetFileTransferDialog, 
     resetBluetoothPairingDialog, 
+    resetUsbPairingDialog,
     showDownloadDialogAsync, 
     showFileTransferDialogAsync
 } from "./dialogs";
@@ -73,13 +74,14 @@ pxt.editor.initExtensionsAsync = function (opts: pxt.editor.ExtensionOptions): P
             },
             */
             isDeployTransportSelected() && {
-                text: lf("Upload method"),
+                text: lf("Upload Method"),
                 icon: "exchange",
                 className: "upload-method",
                 onClick: async () => {
                     resetDeployTransport();
                     resetFileTransferDialog();
                     resetBluetoothPairingDialog();
+                    resetUsbPairingDialog();
 
                     return showDownloadDialogAsync(await getDownloadFileName());
                 }

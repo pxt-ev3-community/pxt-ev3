@@ -58,7 +58,13 @@
         "floatingPoint": true,
         "taggedInts": true,
         "stackAlign": 2,
-        "gc": true
+        "gc": true,
+        "hidSelectors": [
+            {
+                "vid": "0x0694",
+                "pid": "0x0005"
+            }
+        ]
     },
     "serial": {
         "vendorId": "0x0694",
@@ -228,7 +234,7 @@
         "pxtJsonOptions": [
             {   
                 "property": "uploadProjectFolder",
-                "label": "Custom folder for Bluetooth upload",
+                "label": "Custom Folder for USB and Bluetooth Upload",
                 "type": "input"
             }
         ]

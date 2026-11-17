@@ -4,16 +4,19 @@
 import HF2 = pxt.HF2;
 import UF2 = pxtc.UF2;
 
-import { transport } from "./transport";
-import { resetBluetoothPairingDialog, showEv3ConnectionFailedDialogAsync } from "./dialogs";
+import { transport, DeployTransport } from "./transport";
+import { WebHidIO } from "./webhid";
+import { Ev3Wrapper } from "./wrap";
+import { 
+    ConnectionFailedAction, 
+    resetBluetoothPairingDialog, 
+    resetUsbPairingDialog, 
+    showBluetoothConnectionStuckDialogAsync,
+    showEv3ConnectionFailedDialogAsync 
+} from "./dialogs";
 
 
-enum DeployTransport {
-    NotSelected,
-    FileTransfer,
-    BluetoothWebSerial,
-    // UsbHid
-}
+export { DeployTransport };
 
 // This comes from aux/pxt.lms
 const defaultUploadProjectFolder = "BrkProg_SAVE";
@@ -25,40 +28,50 @@ const rbfTemplate = `
 74617274696e672e2e2e0084006080XX00448581644886488405018130813e80427965210084000a
 `;
 
-let preferredTransport = DeployTransport.NotSelected;
+let preferredTransport = DeployTransport.None;
 
 export function canUseWebSerial(): boolean {
     return !!(navigator as any).serial;
+}
+
+export function canUseWebHID(): boolean {
+    return WebHidIO.supported();
 }
 
 export function setUseFileTransfer() {
     preferredTransport = DeployTransport.FileTransfer;
 }
 
-// export function setUseUsbHID() {
-//     preferredTransport = DeployTransport.UsbHid;
-// }
+export function setUseUsbWebHID() {
+    preferredTransport = DeployTransport.UsbWebHid;
+}
 
 export function setUseBluetoothWebSerial() {
     preferredTransport = DeployTransport.BluetoothWebSerial;
 }
 
+export function getPreferredTransport(): DeployTransport {
+    return preferredTransport;
+}
+
 export async function resetDeployTransport() {
-    preferredTransport = DeployTransport.NotSelected;
+    preferredTransport = DeployTransport.None;
     await transport.disconnectAsync(true);
 }
 
 export function isDeployTransportSelected(): boolean {
-    return preferredTransport !== DeployTransport.NotSelected;
+    return preferredTransport !== DeployTransport.None;
 }
 
-export async function deployCoreAsync(resp: pxtc.CompileResult) {
+export async function deployCoreAsync(resp: pxtc.CompileResult): Promise<void> {
     console.log(`START DEPLOY`);
 
     const filename = (resp.downloadFileBaseName || "pxt").replace(/^lego-/, "");
     const projectPxtJson = await (window as any).getPxtJson();
+    const isFileTransfer = preferredTransport === DeployTransport.FileTransfer;
+    const isUsbWebHid = preferredTransport === DeployTransport.UsbWebHid;
     const isWebSerial = preferredTransport === DeployTransport.BluetoothWebSerial;
-    const uploadProjectFolder = isWebSerial && projectPxtJson?.uploadProjectFolder ? projectPxtJson.uploadProjectFolder : defaultUploadProjectFolder;
+    const uploadProjectFolder = (isWebSerial || isUsbWebHid) && projectPxtJson?.uploadProjectFolder ? projectPxtJson.uploadProjectFolder : defaultUploadProjectFolder;
 
     const fspath = `../prjs/${uploadProjectFolder}/`;
     // console.log(`fspath: ${fspath}`);
@@ -74,8 +87,8 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
     // Parse elf
     const origElfUF2 = UF2.parseFile(pxt.U.stringToUint8Array(ts.pxtc.decodeBase64(resp.outfiles[pxt.outputName()])));
     
-    // USB MODE (UF2 packaging like original pxt-ev3)
-    if (!isWebSerial) {
+    // FILE TRANSFER MODE (UF2 packaging like original pxt-ev3)
+    if (isFileTransfer) {
         const mkFile = (ext: string, data?: Uint8Array) => {
             const f = UF2.newBlockFile();
             f.filename = "Projects/" + filename + ext;
@@ -103,23 +116,63 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         return Promise.resolve();
     }
 
-    // WEBSERIAL MODE
-    pxt.tickEvent("webserial.flash");
+    // DIRECT FLASH MODE (WebSerial or WebHID)
+    const tickPrefix = isUsbWebHid ? "webhid" : "webserial";
+    pxt.tickEvent(`${tickPrefix}.flash`);
     try {
-        const wrapper = await transport.connectAsync();
+        let wrapper: Ev3Wrapper;
+        try {
+            wrapper = await transport.connectAsync(preferredTransport);
+        } catch (connErr: any) {
+            if (connErr?.message === "NO_PORT_SELECTED" || connErr?.message === "NO_DEVICE_SELECTED") {
+                await resetDeployTransport();
+                resetBluetoothPairingDialog();
+                resetUsbPairingDialog();
+                console.warn(`${isUsbWebHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
+                return;
+            }
+            if (connErr?.message === "PORT_OPEN_FAILED") {
+                await transport.disconnectAsync(false);
+                const action = await showBluetoothConnectionStuckDialogAsync();
+                if (action === ConnectionFailedAction.Retry) {
+                    return deployCoreAsync(resp);
+                }
+                if (action === ConnectionFailedAction.ReselectDevice) {
+                    await transport.disconnectAsync(true);
+                    return deployCoreAsync(resp);
+                }
+                return;
+            }
+            await transport.disconnectAsync(false);
+            console.warn("Connection attempt failed:", connErr);
+            const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
+            if (action === ConnectionFailedAction.Retry) {
+                return deployCoreAsync(resp);
+            }
+            if (action === ConnectionFailedAction.ReselectDevice) {
+                await transport.disconnectAsync(true);
+                return deployCoreAsync(resp);
+            }
+            return;
+        }
         
         const isEv3Connected = await wrapper.isEv3ConnectedAsync();
         if (!isEv3Connected) {
             console.warn("EV3 is not responding.");
-            await transport.disconnectAsync(true);
-            await showEv3ConnectionFailedDialogAsync();
-
+            await transport.disconnectAsync(false);
+            const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
+            if (action === ConnectionFailedAction.Retry) {
+                return deployCoreAsync(resp);
+            }
+            if (action === ConnectionFailedAction.ReselectDevice) {
+                await transport.disconnectAsync(true);
+                return deployCoreAsync(resp);
+            }
             return;
         }
 
         try {
-            const ev3Name = await wrapper.getEv3NameAsync();
-            console.log(`Connected to EV3: ${ev3Name}`);
+            await wrapper.getEv3NameAsync();
         } catch (e) {
             console.warn("Failed to get EV3 name, continuing deployment.", e);
         }
@@ -128,19 +181,30 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
         if (isPxtAppRunning) {
             await wrapper.stopAsync();
         }
-        await wrapper.rmAsync(elfPath); // Remove old file of the program
+        try {
+            await wrapper.rmAsync(elfPath); // Remove old file of the program
+        } catch (e) {
+            if (!isPxtAppRunning) {
+                pxt.log("rm failed, attempting stop and retry rm in case app was running...");
+                await wrapper.tryStopRunningAppAsync();
+                await wrapper.rmAsync(elfPath);
+            } else {
+                throw e;
+            }
+        }
         await wrapper.flashAsync(elfPath, UF2.readBytes(origElfUF2, 0, origElfUF2.length * 256));
         await wrapper.flashAsync(rbfPath, rbfBIN);
         await wrapper.runAsync(rbfPath);
 
         console.log("DEPLOY FINISHED");
 
-        pxt.tickEvent("webserial.success");
+        pxt.tickEvent(`${tickPrefix}.success`);
     } catch (e: any) {
-        if (e?.message === "NO_PORT_SELECTED") {
+        if (e?.message === "NO_PORT_SELECTED" || e?.message === "NO_DEVICE_SELECTED") {
             await resetDeployTransport();
             resetBluetoothPairingDialog();
-            console.warn("Bluetooth download cancelled: no serial port was selected.");
+            resetUsbPairingDialog();
+            console.warn(`${isUsbWebHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
             
             return;
         }
@@ -149,7 +213,7 @@ export async function deployCoreAsync(resp: pxtc.CompileResult) {
             resetBluetoothPairingDialog();
         }
 
-        pxt.tickEvent("webserial.fail");
+        pxt.tickEvent(`${tickPrefix}.fail`);
         throw e;
     }
 }
