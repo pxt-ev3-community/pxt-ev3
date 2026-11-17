@@ -447,6 +447,7 @@ export class Ev3Wrapper {
 
     flashAsync(path: string, file: Uint8Array) {
         log(`Write ${file.length} bytes to ${path}`);
+        const startTime = Date.now();
 
         let handle = -1;
         let loopAsync = (pos: number): Promise<void> => {
@@ -474,6 +475,12 @@ export class Ev3Wrapper {
                     handle = resp[7];
 
                     return loopAsync(0);
+                })
+                .then(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const speed = (file.length / 1024 / (elapsed || 0.001)).toFixed(1);
+                    const fileName = path.split("/").pop() || path;
+                    log(`Flash completed (${fileName}): ${file.length} bytes in ${elapsed.toFixed(2)}s (${speed} KB/s)`);
                 }));
     }
 
