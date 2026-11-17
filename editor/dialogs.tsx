@@ -96,21 +96,8 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="sixteen wide column">
-                            <div className="ui info message" style={{
-                                backgroundColor: "#f8f9fa",
-                                boxShadow: "inset 0 0 0 1px #dcdcdc",
-                                color: "var(--pxt-neutral-foreground1, #5e5e5e)",
-                                margin: "0.25rem 0 0 0",
-                                padding: "0.75rem 1rem"
-                            }}>
-                                <div className="header" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", marginBottom: "0.35rem" }}>
-                                    {lf("Note")}
-                                </div>
-                                <p style={{ margin: 0, color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                                    {lf("To change the upload method, click the '...' button next to 'Download' and select 'Upload method'.")}
-                                </p>
-                            </div>
+                        <div className="sixteen wide column" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", paddingTop: "0.5rem" }}>
+                            <i className="info circle icon" /> {lf("To change the upload method, click the '...' button next to 'Download' and select 'Upload method'.")}
                         </div>
                     </div>
                 </div>
