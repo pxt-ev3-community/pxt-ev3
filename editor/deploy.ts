@@ -11,6 +11,7 @@ import {
     ConnectionFailedAction, 
     resetBluetoothPairingDialog, 
     resetUsbPairingDialog, 
+    showBluetoothConnectionStuckDialogAsync,
     showEv3ConnectionFailedDialogAsync 
 } from "./dialogs";
 
@@ -130,6 +131,19 @@ export async function deployCoreAsync(resp: pxtc.CompileResult): Promise<void> {
                 console.warn(`${isUsbWebHid ? "USB" : "Bluetooth"} download cancelled: no device/port was selected.`);
                 return;
             }
+            if (connErr?.message === "PORT_OPEN_FAILED") {
+                await transport.disconnectAsync(false);
+                const action = await showBluetoothConnectionStuckDialogAsync();
+                if (action === ConnectionFailedAction.Retry) {
+                    return deployCoreAsync(resp);
+                }
+                if (action === ConnectionFailedAction.ReselectDevice) {
+                    await transport.disconnectAsync(true);
+                    return deployCoreAsync(resp);
+                }
+                return;
+            }
+            await transport.disconnectAsync(false);
             console.warn("Connection attempt failed:", connErr);
             const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
             if (action === ConnectionFailedAction.Retry) {
@@ -142,16 +156,10 @@ export async function deployCoreAsync(resp: pxtc.CompileResult): Promise<void> {
             return;
         }
         
-        let isEv3Connected = await wrapper.isEv3ConnectedAsync();
-        if (!isEv3Connected) {
-            pxt.log("EV3 did not respond to PING, checking if app is running or attempting stop...");
-            await wrapper.tryStopRunningAppAsync();
-            isEv3Connected = await wrapper.isEv3ConnectedAsync();
-        }
-
+        const isEv3Connected = await wrapper.isEv3ConnectedAsync();
         if (!isEv3Connected) {
             console.warn("EV3 is not responding.");
-            await transport.disconnectAsync(true);
+            await transport.disconnectAsync(false);
             const action = await showEv3ConnectionFailedDialogAsync(preferredTransport);
             if (action === ConnectionFailedAction.Retry) {
                 return deployCoreAsync(resp);

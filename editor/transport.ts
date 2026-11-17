@@ -4,7 +4,6 @@
 import { Ev3Wrapper } from "./wrap";
 import { WebSerialIO } from "./webserial";
 import { WebHidIO } from "./webhid";
-import { showBluetoothConnectionStuckDialogAsync } from "./dialogs";
 
 
 export enum DeployTransport {
@@ -138,7 +137,7 @@ class TransportManager {
         } catch (e: any) {
             if (e?.message === "Timeout") { // The device opened, but the EV3 did not respond to PING
                 console.warn("EV3 PING timeout. Selected device/port did not respond.");
-                this.state = TransportState.Unpaired;
+                this.state = TransportState.Idle;
                 throw new Error("EV3_RESPONSE_TIMEOUT");
             }
             if (e?.message === "NO_PORT_SELECTED" || e?.message === "NO_DEVICE_SELECTED") { // The user closed the selection window
@@ -165,8 +164,7 @@ class TransportManager {
                     this.io = undefined;
                     this.wrapper = undefined;
                 }
-                this.state = TransportState.Unpaired;
-                await showBluetoothConnectionStuckDialogAsync();
+                this.state = TransportState.Idle;
                 throw e;
             }
 
