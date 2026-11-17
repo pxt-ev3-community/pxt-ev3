@@ -19,6 +19,7 @@ export enum ConnectionFailedAction {
 }
 
 let skipFileTransferDialog = false;
+let skipUsbPairingDialog = false;
 let skipBluetoothPairingDialog = false;
 
 let confirmAsync: (options: any) => Promise<number>;
@@ -32,7 +33,7 @@ export function resetFileTransferDialog() {
 }
 
 export function resetUsbPairingDialog() {
-    // Kept for interface compatibility
+    skipUsbPairingDialog = false;
 }
 
 export function resetBluetoothPairingDialog() {
@@ -296,15 +297,64 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
 }
 
 export async function showUsbPairingDialogAsync(): Promise<boolean> {
-    if (!confirmAsync) return Promise.resolve(true);
+    if (!confirmAsync || skipUsbPairingDialog) return Promise.resolve(true);
 
     const docUrl = pxt.appTarget.appTheme.usbDocs ? pxt.appTarget.appTheme.usbDocs : false;
 
     const jsx = (
-        <div>
-            <p>{lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}</p>
-            <p>{lf("Connect your EV3 to your computer with a USB cable and make sure the brick is turned on.")}</p>
-            <p>{lf("When prompted by the browser, select 'Xfer data to and from EV3 brick' and click 'Connect'.")}</p>
+        <div style={{ padding: "0.25rem 0" }}>
+            <p style={{ marginBottom: "1rem" }}>
+                {lf("USB download uses WebHID. Your browser will ask for permission to connect to your EV3 brick.")}
+            </p>
+
+            <div className="ui two column grid stackable" style={{ alignItems: "center" }}>
+                <div className="six wide column" style={{ textAlign: "center" }}>
+                    <img
+                        className="ui image"
+                        src="/static/download/connect.svg"
+                        style={{
+                            maxHeight: "115px",
+                            maxWidth: "100%",
+                            margin: "0 auto",
+                            display: "inline-block"
+                        }}
+                    />
+                </div>
+
+                <div className="ten wide column">
+                    <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                        <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
+                        <div>
+                            <strong>{lf("Connect EV3 brick")}</strong>
+                            <div style={{ marginTop: "0.25rem" }}>
+                                {lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected,")} <strong>'USB'</strong> {lf("appears next to the battery icon on the brick screen.")}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "flex-start" }}>
+                        <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
+                        <div>
+                            <strong>{lf("Select device in browser")}</strong>
+                            <div style={{ marginTop: "0.25rem" }}>
+                                {lf("When prompted by the browser, select")} <strong>'Xfer data to and from EV3 brick'</strong> {lf("and click")} <strong>'Connect'</strong>.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style={{ marginTop: "1rem" }}>
+                <div className="ui toggle checkbox">
+                    <input
+                        type="checkbox"
+                        onChange={e => {
+                            skipUsbPairingDialog = e.currentTarget.checked;
+                        }}
+                    />
+                    <label>{lf("Don't show this again")}</label>
+                </div>
+            </div>
         </div>
     );
 
@@ -313,6 +363,10 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
         jsx,
         hasCloseIcon: true,
         hideCancel: true,
+        hideAgree: false,
+        agreeLbl: lf("Connect"),
+        agreeIcon: "usb",
+        className: "downloaddialog",
         buttons: [
             docUrl && {
                 label: lf("Help"),
