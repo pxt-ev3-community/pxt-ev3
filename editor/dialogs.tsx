@@ -463,11 +463,11 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                         {lf("When prompted by the browser, select the serial port with the name of your EV3.")}
                     </div>
                     {pxt.BrowserUtils.isWindows() && (
-                        <div style={{ marginTop: "0.35rem", fontSize: "14px", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                        <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                             {lf("On Windows, if your EV3 name is not shown, select the outgoing Bluetooth COM port assigned to your EV3 in Bluetooth COM Ports settings.")}
                         </div>
                     )}
-                    <div style={{ marginTop: "0.35rem", fontSize: "14px", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                    <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                         {lf("Do not select unrelated COM ports or USB devices. If the EV3 does not respond, try selecting a different Bluetooth serial port.")}
                     </div>
                 </div>
