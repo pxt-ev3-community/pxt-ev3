@@ -107,10 +107,9 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                                 <div className="header" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", marginBottom: "0.35rem" }}>
                                     {lf("Note")}
                                 </div>
-                                <ul className="ui bulleted list" style={{ margin: "0.25rem 0 0 1.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                                    <li>{lf("To change the upload method, click the '...' button next to Download and select 'Upload method'.")}</li>
-                                    <li>{lf("USB and Bluetooth allow uploading to a custom folder specified in project settings.")}</li>
-                                </ul>
+                                <p style={{ margin: 0, color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                                    {lf("To change the upload method, click the '...' button next to 'Download' and select 'Upload method'.")}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -344,7 +343,11 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                 </div>
             </div>
 
-            <div style={{ marginTop: "1rem" }}>
+            <div style={{ marginTop: "1.5rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                <i className="info circle icon" /> {lf("USB allows uploading to a custom folder specified in 'Project Settings'.")}
+            </div>
+
+            <div style={{ marginTop: "1.5rem" }}>
                 <div className="ui toggle checkbox">
                     <input
                         type="checkbox"
@@ -359,7 +362,7 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
     );
 
     return confirmAsync({
-        header: lf("USB connection"),
+        header: lf("USB WebHID connection"),
         jsx,
         hasCloseIcon: true,
         hideCancel: true,
@@ -391,6 +394,9 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                 <p>{lf("On some Windows computers, the browser may not display your EV3 by name. The exact cause of this issue has not yet been determined. In this case, select the outgoing Bluetooth COM port assigned to your EV3. You can check the Bluetooth settings and open the COM Ports tab to identify the ports assigned to your EV3.")}</p>
             )}
             <p>{lf("Do not select unrelated COM ports, USB devices, or serial ports belonging to other hardware. If the EV3 does not respond after selecting a port, try selecting a different Bluetooth serial port.")}</p>
+            <p style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                <i className="info circle icon" /> {lf("Bluetooth allows uploading to a custom folder specified in 'Project Settings'.")}
+            </p>
             <div className="ui toggle checkbox">
                 <input
                     type="checkbox"
