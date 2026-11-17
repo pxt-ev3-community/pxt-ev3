@@ -240,7 +240,7 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
                         <strong>
                             {lf("Connect the EV3 to your computer with a USB cable")}
                         </strong>
-                        <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                        <div style={{ fontSize: "15px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                             {lf("Use the miniUSB port on the top of the EV3 Brick.")}
                         </div>
                     </div>
@@ -266,7 +266,7 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
                         <strong>
                             {lf("Move the .uf2 file to the EV3 Brick")}
                         </strong>
-                        <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                        <div style={{ fontSize: "15px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                             {lf("Locate the downloaded .uf2 file and drag it to the EV3 USB drive.")}
                         </div>
                     </div>
@@ -347,13 +347,13 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                         <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
                         <div>
                             <strong>{lf("Connect EV3 brick")}</strong>
-                            <div style={{ marginTop: "0.25rem" }}>
+                            <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                                 {jsxLF(
                                     lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected, {0} appears next to the battery icon on the brick screen."),
                                     <strong>'USB'</strong>
                                 )}
                             </div>
-                            <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                            <div style={{ fontSize: "15px", marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                                 {jsxLF(
                                     lf("If {0} or other apps (e.g., {1}) are open on the EV3, close them before downloading."),
                                     <strong>'Port View'</strong>,
@@ -367,7 +367,7 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                         <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
                         <div>
                             <strong>{lf("Select device in browser")}</strong>
-                            <div style={{ marginTop: "0.25rem" }}>
+                            <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                                 {jsxLF(
                                     lf("When prompted by the browser, select {0} and click {1}."),
                                     <strong>'Xfer data to and from EV3 brick'</strong>,
@@ -433,7 +433,7 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                 <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
                 <div>
                     <strong>{lf("Turn on and pair EV3")}</strong>
-                    <div style={{ marginTop: "0.25rem" }}>
+                    <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                         {lf("Make sure your EV3 is turned on and already paired with your computer in Bluetooth settings.")}
                     </div>
                 </div>
@@ -442,8 +442,8 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
             <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
                 <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
                 <div>
-                    <strong>{lf("Close conflicting apps")}</strong>
-                    <div style={{ marginTop: "0.25rem" }}>
+                    <strong>{lf("Close conflicting apps and pop-ups")}</strong>
+                    <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                         {jsxLF(
                             lf("Close applications that may be using the Bluetooth connection, such as {0}, {1}, or other editor tabs (BrickCode). If {2} or other apps (e.g., {3}) are open on the EV3 brick, close them before downloading."),
                             <strong>'EV3 Lab'</strong>,
@@ -452,6 +452,9 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                             <strong>'Motor Control'</strong>
                         )}
                     </div>
+                    <div style={{ fontSize: "15px", marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                        {lf("Make sure no pop-up windows are open on the EV3, as they will prevent the downloaded app from launching.")}
+                    </div>
                 </div>
             </div>
 
@@ -459,15 +462,22 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                 <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>3</span>
                 <div>
                     <strong>{lf("Select EV3 port in browser")}</strong>
-                    <div style={{ marginTop: "0.25rem" }}>
+                    <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                         {lf("When prompted by the browser, select the serial port with the name of your EV3.")}
                     </div>
                     {pxt.BrowserUtils.isWindows() && (
-                        <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                            {lf("On Windows, if your EV3 name is not shown, select the outgoing Bluetooth COM port assigned to your EV3 in Bluetooth COM Ports settings.")}
+                        <div style={{ fontSize: "15px", marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                            {jsxLF(
+                                lf("On Windows, if your EV3 name is not shown, select the {0} port (found in: {1} > {2} > {3} > {4})."),
+                                <strong>'{lf("Outgoing")}'</strong>,
+                                <strong>{lf("Bluetooth & devices")}</strong>,
+                                <strong>{lf("Devices")}</strong>,
+                                <strong>{lf("More Bluetooth settings")}</strong>,
+                                <strong>{lf("COM Ports")}</strong>
+                            )}
                         </div>
                     )}
-                    <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
+                    <div style={{ fontSize: "15px", marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
                         {lf("Do not select unrelated COM ports or USB devices. If the EV3 does not respond, try selecting a different Bluetooth serial port.")}
                     </div>
                 </div>
@@ -522,88 +532,87 @@ export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTranspo
         <div>
             <p style={{ marginBottom: "1.2rem" }}>
                 {isUsb
-                    ? lf("EV3 was not recognized or is still connecting. Windows may take a few seconds to configure the USB device after connecting.")
-                    : lf("EV3 was not found on Bluetooth. Make sure Bluetooth is turned on and EV3 is paired with your computer.")}
+                    ? lf("EV3 was not recognized or is still connecting. Your computer may take a few seconds to configure the USB device after connecting.")
+                    : lf("The serial port opened, but your EV3 is not responding. Make sure the correct serial port was selected and the EV3 is on the main menu.")}
             </p>
 
             <div>
                 {isUsb ? (
                     <div>
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">1</span>
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
                             <div>
                                 <strong>{lf("Just reconnected?")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
-                                    {lf("Wait 2–3 seconds for Windows to detect the brick, then click 'Retry'.")}
-                                </span>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                                    {lf("Wait 2–3 seconds for your computer to detect the brick, then click 'Retry'.")}
+                                </div>
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">2</span>
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
                             <div>
                                 <strong>{lf("Check the cable")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                                     {lf("Make sure the miniUSB cable is firmly plugged into the PC port on the top of the EV3 and into your computer.")}
-                                </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">3</span>
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>3</span>
                             <div>
                                 <strong>{lf("Check EV3 power")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
                                     {lf("Verify that the EV3 brick is turned on and ready.")}
-                                </span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <div>
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">1</span>
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
                             <div>
-                                <strong>{lf("Check pairing")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
-                                    {lf("Make sure the EV3 is paired with your computer in Windows Bluetooth settings.")}
-                                </span>
+                                <strong>{lf("Check selected serial port")}</strong>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                                    {jsxLF(
+                                        lf("Make sure you selected the outgoing Bluetooth serial port for your EV3 (not the incoming port or another robot). Click {0} to choose a different port."),
+                                        <strong>'{lf("Reselect Device")}'</strong>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">2</span>
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
+                            <div>
+                                <strong>{lf("Return to main menu")}</strong>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                                    {jsxLF(
+                                        lf("If {0} is open or a program was started before connecting, press the {1} button on the EV3 to return to the main menu."),
+                                        <strong>'Port View'</strong>,
+                                        <strong>'{lf("Back")}'</strong>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                            <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>3</span>
                             <div>
                                 <strong>{lf("Close other apps")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
-                                    {lf("Close EV3 Lab, EV3 Classroom, or other browser tabs that may be using the Bluetooth serial connection.")}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div style={{ marginBottom: "0.8rem", display: "flex", alignItems: "flex-start" }}>
-                            <span className="ui yellow circular label">3</span>
-                            <div>
-                                <strong>{lf("Close Port View")}</strong>
-                                <br />
-                                <span style={{ fontSize: "14px" }}>
-                                    {lf("If 'Port View' is open on the EV3 brick, close it before downloading.")}
-                                </span>
+                                <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                                    {jsxLF(
+                                        lf("Close {0}, {1}, or other browser tabs that may be using the Bluetooth serial connection."),
+                                        <strong>'EV3 Lab'</strong>,
+                                        <strong>'EV3 Classroom'</strong>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 )}
-            </div>
-
-            <div style={{ marginTop: "1.2rem", paddingTop: "0.8rem", borderTop: "1px solid #e0e0e0", fontSize: "small", color: "#666" }}>
-                <i className="repeat icon" /> <strong>{lf("Retry:")}</strong> {lf("Attempt to reconnect to the already approved device.")}
-                <br />
-                <i className="exchange icon" /> <strong>{lf("Reselect device:")}</strong> {lf("Open browser dialog to pick the EV3 again.")}
             </div>
         </div>
     );
@@ -619,7 +628,7 @@ export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTranspo
         jsx,
         buttons: [
             {
-                label: lf("Reselect device"),
+                label: lf("Reselect Device"),
                 icon: "exchange",
                 className: "lightgrey",
                 onclick: () => {
@@ -638,21 +647,86 @@ export function showEv3ConnectionFailedDialogAsync(transportType?: DeployTranspo
     });
 }
 
-export async function showBluetoothConnectionStuckDialogAsync(): Promise<void> {
-    if (!confirmAsync) return Promise.resolve();
+export function showBluetoothConnectionStuckDialogAsync(): Promise<ConnectionFailedAction> {
+    if (!confirmAsync) return Promise.resolve(ConnectionFailedAction.Cancel);
 
-    await confirmAsync({
-        header: lf("Bluetooth connection stuck"),
+    let selectedAction = ConnectionFailedAction.Cancel;
+
+    const jsx = (
+        <div>
+            <p style={{ marginBottom: "1.2rem" }}>
+                {lf("Could not open the Bluetooth connection with your EV3. The brick may be turned off, Bluetooth may be disabled, or the connection timed out.")}
+            </p>
+
+            <div>
+                <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                    <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>1</span>
+                    <div>
+                        <strong>{lf("Check EV3 power and Bluetooth")}</strong>
+                        <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                            {lf("Make sure your EV3 brick is turned on, in range, and Bluetooth is enabled in the EV3 settings.")}
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                    <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>2</span>
+                    <div>
+                        <strong>{lf("Check or redo pairing")}</strong>
+                        <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                            {jsxLF(
+                                lf("Check {0} > {1} > {2} on your EV3. If your computer is not listed, or if EV3 asks {3}, the pairing was lost. Remove EV3 in your computer's Bluetooth settings and pair it again."),
+                                <strong>Settings</strong>,
+                                <strong>Bluetooth</strong>,
+                                <strong>Connections</strong>,
+                                <strong>'Connect?'</strong>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div style={{ marginBottom: "0.9rem", display: "flex", alignItems: "flex-start" }}>
+                    <span className="ui yellow circular label" style={{ flexShrink: 0, marginTop: "0.15em" }}>3</span>
+                    <div>
+                        <strong>{lf("Restart Bluetooth")}</strong>
+                        <div style={{ fontSize: "15px", marginTop: "0.25rem" }}>
+                            {jsxLF(
+                                lf("Turn Bluetooth off and on in the EV3 settings or on your computer to reset the radio channel, then click {0}."),
+                                <strong>'{lf("Retry")}'</strong>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    return confirmAsync({
+        header: lf("Could not connect over Bluetooth"),
+        className: "downloaddialog",
         hasCloseIcon: true,
         hideCancel: true,
         hideAgree: false,
-        agreeLbl: lf("OK"),
-        jsx: (
-            <div>
-                <p>{lf("The Bluetooth connection could not be established.")}</p>
-                <p>{lf("This can happen if a previous Bluetooth connection is still active or if the Bluetooth connection is temporarily unavailable.")}</p>
-                <p>{lf("Stop the program on the EV3 and try again. If the problem persists, turn Bluetooth off and on again, then try again.")}</p>
-            </div>
-        )
+        agreeLbl: lf("Retry"),
+        agreeIcon: "repeat",
+        jsx,
+        buttons: [
+            {
+                label: lf("Reselect Device"),
+                icon: "exchange",
+                className: "lightgrey",
+                onclick: () => {
+                    selectedAction = ConnectionFailedAction.ReselectDevice;
+                }
+            }
+        ]
+    }).then(result => {
+        if (selectedAction === ConnectionFailedAction.ReselectDevice) {
+            return ConnectionFailedAction.ReselectDevice;
+        }
+        if (result === 1) {
+            return ConnectionFailedAction.Retry;
+        }
+        return ConnectionFailedAction.Cancel;
     });
 }
