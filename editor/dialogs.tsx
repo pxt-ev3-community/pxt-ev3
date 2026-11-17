@@ -22,6 +22,29 @@ let skipFileTransferDialog = false;
 let skipUsbPairingDialog = false;
 let skipBluetoothPairingDialog = false;
 
+// Standard MakeCode utility pattern for interpolating JSX elements into localized strings with {0}, {1} placeholders
+function jsxLF(loc: string, ...rest: JSX.Element[]): JSX.Element[] {
+    const indices: number[] = [];
+    loc.replace(/\{\d\}/g, match => {
+        indices.push(parseInt(match.substr(1, 1)));
+        return match;
+    });
+
+    const out: JSX.Element[] = [];
+    let parts: string[];
+    let i = 0;
+
+    for (const index of indices) {
+        parts = loc.split(`{${index}}`);
+        out.push(<span key={i++}>{parts[0]}</span>);
+        out.push(<span key={i++}>{rest[index]}</span>);
+        loc = parts[1];
+    }
+    out.push(<span key={i++}>{loc}</span>);
+
+    return out;
+}
+
 let confirmAsync: (options: any) => Promise<number>;
 
 export function setConfirmAsync(fn: (options: any) => Promise<number>) {
@@ -68,7 +91,7 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                                 <span className="ui yellow circular label">1</span>
                                 <div className="download-step-content">
                                     <strong>{lf("File Transfer")}</strong>
-                                    <p>{lf("This is the standard way to transfer a program to your EV3. Download the program as a file and transfer it to the EV3 manually. The program is saved to the standard folder.")}</p>
+                                    <p>{lf("This is the historical, standard way to transfer a program to your EV3 over USB. Download the program as a file and transfer it to the EV3 drive manually.")}</p>
                                 </div>
                             </div>
                         </div>
@@ -97,7 +120,12 @@ export function showDownloadDialogAsync(projectName: string): Promise<void> {
                     </div>
                     <div className="row">
                         <div className="sixteen wide column" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", paddingTop: "0.5rem" }}>
-                            <i className="info circle icon" /> {lf("To change the upload method, click the '...' button next to 'Download' and select 'Upload method'.")}
+                            <i className="info circle icon" /> {jsxLF(
+                                lf("To change the upload method, click the {0} button next to {1} and select {2}."),
+                                <strong>'...'</strong>,
+                                <strong>'{lf("Download")}'</strong>,
+                                <strong>'{lf("Upload Method")}'</strong>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -213,7 +241,7 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
                             {lf("Connect the EV3 to your computer with a USB cable")}
                         </strong>
                         <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                            {lf("Use the miniUSB port on the top of the EV3 Brick")}
+                            {lf("Use the miniUSB port on the top of the EV3 Brick.")}
                         </div>
                     </div>
                 </div>
@@ -239,13 +267,20 @@ export function showFileTransferDialogAsync(fn: string, url: string, _confirmAsy
                             {lf("Move the .uf2 file to the EV3 Brick")}
                         </strong>
                         <div style={{ fontSize: "14px", marginTop: "0.25rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                            {lf("Locate the downloaded .uf2 file and drag it to the EV3 USB drive")}
+                            {lf("Locate the downloaded .uf2 file and drag it to the EV3 USB drive.")}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="sixteen wide column" style={{ paddingTop: "1.25rem" }}>
+            <div className="sixteen wide column" style={{ color: "var(--pxt-neutral-foreground1, #5e5e5e)", paddingTop: "1.25rem" }}>
+                <i className="info circle icon" /> {jsxLF(
+                    lf("The program is saved to the standard {0} folder."),
+                    <strong>'BrkProg_SAVE'</strong>
+                )}
+            </div>
+
+            <div className="sixteen wide column" style={{ paddingTop: "0.8rem" }}>
                 <div className="ui toggle checkbox">
                     <input
                         type="checkbox"
@@ -313,10 +348,17 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                         <div>
                             <strong>{lf("Connect EV3 brick")}</strong>
                             <div style={{ marginTop: "0.25rem" }}>
-                                {lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected,")} <strong>'USB'</strong> {lf("appears next to the battery icon on the brick screen.")}
+                                {jsxLF(
+                                    lf("Connect the miniUSB cable to the PC port on top of the EV3 and make sure the brick is turned on. When connected, {0} appears next to the battery icon on the brick screen."),
+                                    <strong>'USB'</strong>
+                                )}
                             </div>
                             <div style={{ marginTop: "0.35rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                                {lf("If")} <strong>'Port View'</strong> {lf("or other apps (e.g.,")} <strong>'Motor Control'</strong>{lf(") are open on the EV3, close them before downloading.")}
+                                {jsxLF(
+                                    lf("If {0} or other apps (e.g., {1}) are open on the EV3, close them before downloading."),
+                                    <strong>'Port View'</strong>,
+                                    <strong>'Motor Control'</strong>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -326,7 +368,11 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
                         <div>
                             <strong>{lf("Select device in browser")}</strong>
                             <div style={{ marginTop: "0.25rem" }}>
-                                {lf("When prompted by the browser, select")} <strong>'Xfer data to and from EV3 brick'</strong> {lf("and click")} <strong>'Connect'</strong>.
+                                {jsxLF(
+                                    lf("When prompted by the browser, select {0} and click {1}."),
+                                    <strong>'Xfer data to and from EV3 brick'</strong>,
+                                    <strong>'{lf("Connect")}'</strong>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -334,7 +380,10 @@ export async function showUsbPairingDialogAsync(): Promise<boolean> {
             </div>
 
             <div style={{ marginTop: "1.5rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                <i className="info circle icon" /> {lf("USB allows uploading to a custom folder specified in 'Project Settings'.")}
+                <i className="info circle icon" /> {jsxLF(
+                    lf("USB allows uploading to a custom folder specified in {0}."),
+                    <strong>'{lf("Project Settings")}'</strong>
+                )}
             </div>
 
             <div style={{ marginTop: "1.5rem" }}>
@@ -395,7 +444,13 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
                 <div>
                     <strong>{lf("Close conflicting apps")}</strong>
                     <div style={{ marginTop: "0.25rem" }}>
-                        {lf("Close applications that may be using the Bluetooth connection, such as")} <strong>'EV3 Lab'</strong>, <strong>'EV3 Classroom'</strong>, {lf("or other editor tabs (BrickCode). If")} <strong>'Port View'</strong> {lf("or other apps (e.g.,")} <strong>'Motor Control'</strong>{lf(") are open on the EV3 brick, close them before downloading.")}
+                        {jsxLF(
+                            lf("Close applications that may be using the Bluetooth connection, such as {0}, {1}, or other editor tabs (BrickCode). If {2} or other apps (e.g., {3}) are open on the EV3 brick, close them before downloading."),
+                            <strong>'EV3 Lab'</strong>,
+                            <strong>'EV3 Classroom'</strong>,
+                            <strong>'Port View'</strong>,
+                            <strong>'Motor Control'</strong>
+                        )}
                     </div>
                 </div>
             </div>
@@ -419,7 +474,10 @@ async function showBluetoothPairingDialogAsync(): Promise<boolean> {
             </div>
 
             <div style={{ marginTop: "1.5rem", color: "var(--pxt-neutral-foreground1, #5e5e5e)" }}>
-                <i className="info circle icon" /> {lf("Bluetooth allows uploading to a custom folder specified in 'Project Settings'.")}
+                <i className="info circle icon" /> {jsxLF(
+                    lf("Bluetooth allows uploading to a custom folder specified in {0}."),
+                    <strong>'{lf("Project Settings")}'</strong>
+                )}
             </div>
 
             <div style={{ marginTop: "1.5rem" }}>
