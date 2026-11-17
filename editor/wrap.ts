@@ -582,12 +582,7 @@ export class Ev3Wrapper {
         return Promise.resolve();
     }
 
-    private resetState() {
-        // Pass
-    }
-
     reconnectAsync(first = false): Promise<void> {
-        this.resetState();
         if (first) return this.initAsync();
         
         log(`Reconnect`);
