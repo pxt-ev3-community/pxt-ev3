@@ -147,7 +147,7 @@
             },
             {
                 "name": "Troubleshoot",
-                "path": "https://makecode.mindstorms.com/troubleshoot"
+                "path": "/troubleshoot"
             },
             {
                 "name": "Reference",
