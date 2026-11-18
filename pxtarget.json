@@ -234,7 +234,7 @@
         "pxtJsonOptions": [
             {   
                 "property": "uploadProjectFolder",
-                "label": "Custom Folder for USB and Bluetooth Upload",
+                "label": "Project Folder (USB WebHID & Bluetooth Web Serial)",
                 "type": "input"
             }
         ]
