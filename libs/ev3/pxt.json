@@ -10,7 +10,8 @@
         "images.ts",
         "mood.ts",
         "console.ts",
-        "shims.d.ts"
+        "shims.d.ts",
+        "gallery.jres"
     ],
     "testFiles": [
         "test.ts"
