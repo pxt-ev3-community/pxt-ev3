@@ -23,8 +23,7 @@
         "Infrared Sensor Tutorials": "tutorials/infrared-sensor",
         "Design Engineering": "design-engineering",
         "Coding": "coding",
-        "Maker": "maker",
-        "FLL / City Shaper": "tutorials/city-shaper"
+        "Maker": "maker"
     },
     "electronManifest": {
         "latest": "v1.2.26"
