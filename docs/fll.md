@@ -29,7 +29,7 @@ We have compiled a guide for EV3 LabView users at https://makecode.mindstorms.co
 
 Go to https://makecode.mindstorms.com. The home screen is filled with videos, tutorials and examples that might be relevant for your missions.
 
-On the home page, scroll down to the **FLL / City Shaper** section for specific lessons related to Mission 2.
+See the **[FLL / City Shaper](/tutorials/city-shaper)** tutorials for specific lessons related to Mission 2.
 
 ### Can I load both LEGO MINDSTORMS EV3 Software and MakeCode programs onto my EV3?
 
