@@ -362,6 +362,42 @@ namespace brick {
     }
 
     /**
+     * Draw an image on the screen at given coordinates.
+     * @param image image to draw
+     * @param x horizontal position on screen, eg: 0
+     * @param y vertical position on screen, eg: 0
+     */
+    //% blockId=screen_draw_image
+    //% block="draw image %image at x $x y $y"
+    //% weight=99
+    //% blockGap=18
+    //% group="Screen"
+    //% help=brick/draw-image
+    //% inlineInputMode=inline
+    //% image.shadow=screen_sprite_image
+    export function drawImage(image: Image, x: number = 0, y: number = 0) {
+        if (!image) return;
+        screenMode = ScreenMode.Custom;
+        screen.drawImage(image, x, y);
+    }
+
+    /**
+     * Returns the width or height of an image.
+     * @param picture The image to get the width or height of
+     * @param dimension The dimension to get
+     */
+    //% blockId=image_get_dimension
+    //% block="$picture $dimension"
+    //% weight=98
+    //% blockGap=8
+    //% group="Screen"
+    //% help=brick/image-dimension
+    //% picture.shadow=screen_sprite_image
+    export function imageDimension(picture: Image, dimension: image.Dimension): number {
+        return picture ? image.getDimension(picture, dimension) : 0;
+    }
+
+    /**
     * Display the status of the sensors and motors attached to ports   
     */
     //% blockId=brickShowPorts
@@ -526,5 +562,51 @@ namespace brick {
     //% image.fieldOptions.width=600
     export function __imagePicker(image: Image): Image {
         return image;
+    }
+}
+
+namespace assets {
+
+    //% helper=getImageByName
+    //% pyConvertToTaggedTemplate
+    //% blockIdentity="images._spriteImage"
+    export function image(lits: any, ...args: any[]): Image {
+        return null;
+    }
+}
+
+namespace helpers {
+
+    export type ImageFactory = (name: string) => Image;
+
+    interface Factory {
+        kind: string;
+        factory: (name: string) => any;
+    }
+
+    let factories: Factory[];
+
+    export function _registerFactory(kind: string, factory: (name: string) => any) {
+        if (!factories) factories = [];
+        factories.push({
+            kind,
+            factory
+        });
+    }
+
+    export function _getFactoryInstance(kind: string, name: string) {
+        if (factories) {
+            for (const factory of factories) {
+                if (factory.kind === kind) {
+                    let data = factory.factory(name);
+                    if (data) return data;
+                }
+            }
+        }
+        return null;
+    }
+
+    export function getImageByName(name: string): Image {
+        return _getFactoryInstance("image", name);
     }
 }
