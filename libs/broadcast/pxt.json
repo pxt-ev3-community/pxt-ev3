@@ -9,7 +9,7 @@
     ],
     "weight": 89,
     "searchOnly": false,
-    "icon": "./static/packages/broadcast/icon.png",
+    "icon": "/static/packages/broadcast/icon.png",
     "public": true,
     "dependencies": {
         "core": "file:../core"
