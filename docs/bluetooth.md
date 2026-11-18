@@ -14,6 +14,13 @@ Bluetooth download uses the **Web Serial API**, which is built into modern Chrom
 Web Serial is enabled by default in all modern Chromium browsers. No flags or configuration changes in `chrome://flags` are needed!
 #### ~
 
+#### ~ hint
+### Why Web Serial instead of Web Bluetooth?
+The LEGO MINDSTORMS EV3 brick hardware only supports **Bluetooth Classic 2.1 + EDR (Serial Port Profile / SPP)** and does not support Bluetooth Low Energy (BLE / Bluetooth Smart).
+
+Because the browser [Web Bluetooth API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API) exclusively supports BLE peripherals (such as the BBC micro:bit or LEGO SPIKE Prime), BrickCode uses the **Web Serial API** to communicate with the EV3 over standard Bluetooth RFCOMM serial ports.
+#### ~
+
 ## Step 1: Turn on and pair your EV3
 
 Before downloading over Bluetooth, your computer and EV3 brick must be paired:
