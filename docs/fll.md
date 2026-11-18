@@ -126,7 +126,7 @@ This will present you with a menu for deleting files.
 
 This updated version of File Manager (v2.0) can delete both programs and other files (`.rtf`, `.csv`, `.txt`, etc.), and can even delete itself from the brick (required for competitions when all extra programs must be removed).
 
-For other common questions, try the FAQ page https://makecode.mindstorms.com/faq.
+For other common questions, try the [FAQ](/faq) page.
 
 ## Workarounds
 
