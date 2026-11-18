@@ -8,7 +8,7 @@
     ],
     "weight": 88,
     "searchOnly": false,
-    "icon": "./static/packages/storage/icon.png",
+    "icon": "/static/packages/storage/icon.png",
     "public": true,
     "dependencies": {
         "core": "file:../core"

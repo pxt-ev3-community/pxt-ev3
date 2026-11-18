@@ -2,7 +2,7 @@
     "name": "nxt-light-sensor",
     "description": "LEGO® MINDSTORMS® NXT Light Sensor support",
     "public": true,
-    "icon": "./static/packages/nxt-light-sensor/icon.png",
+    "icon": "/static/packages/nxt-light-sensor/icon.png",
     "weight": 70,
     "searchOnly": false,
     "dependencies": {
