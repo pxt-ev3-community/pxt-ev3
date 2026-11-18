@@ -21,7 +21,6 @@ function bindDocsXHROpen()
     if (docurl.startsWith("#doc:/docs") && !docurl.endsWith(":en"))
     {
         const originalOpen = XMLHttpRequest.prototype.open;
-
         XMLHttpRequest.prototype.open = function(method, url, ...rest)
         {
             console.log("Here2 " + url);
@@ -31,11 +30,54 @@ function bindDocsXHROpen()
                 console.log("Getting translated docs for " + url + " from " + newurl);
                 return originalOpen.apply(this, [method, newurl, ...rest]);
             }
-
             return originalOpen.apply(this, [method, url, ...rest]);
         };
     }
 }
+
+/* Redirect external GitHub tutorial requests on static sites. */
+function bindGitHubTutorialXHROpen()
+{
+    const tutorialApi = "https://cdn.makecode.com/api/ghtutorial/";
+    const localTutorialPath =
+        new URL("ghtutorial/", window.location.href).pathname;
+
+    const originalOpen = XMLHttpRequest.prototype.open;
+
+    XMLHttpRequest.prototype.open = function(method, url, ...rest)
+    {
+        if (String(method).toUpperCase() === "GET") {
+            let requestUrl;
+
+            try {
+                requestUrl = new URL(String(url), window.location.href);
+            } catch (e) {
+                // Let normal XHR handling deal with invalid URLs.
+            }
+
+            if (requestUrl &&
+                requestUrl.origin === window.location.origin &&
+                requestUrl.pathname.startsWith(localTutorialPath))
+            {
+                const tutorialPath =
+                    requestUrl.pathname.slice(localTutorialPath.length);
+
+                if (tutorialPath) {
+                    const newUrl =
+                        tutorialApi + tutorialPath + requestUrl.search;
+
+                    return originalOpen.call(
+                        this, method, newUrl, ...rest
+                    );
+                }
+            }
+        }
+
+        return originalOpen.call(this, method, url, ...rest);
+    };
+}
+
+bindGitHubTutorialXHROpen();
 
 if (window.location.pathname.split('/').pop() == "docs.html")
 {
