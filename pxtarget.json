@@ -75,6 +75,15 @@
         "textBlocks": true,
         "listsBlocks": true,
         "functionBlocks": true,
+        "functionsOptions": {
+            "extraFunctionEditorTypes": [
+                {
+                    "typeName": "Image",
+                    "icon": "image outline",
+                    "defaultName": "myImage"
+                }
+            ]
+        },
         "onStartNamespace": "loops",
         "onStartWeight": 100,
         "onStartColor": "#58AB41",
