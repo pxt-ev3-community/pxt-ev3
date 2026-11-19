@@ -12,6 +12,8 @@ USB download relies on the standard **WebHID API**, which is built into modern C
 * **Microsoft Edge** (version 89 or higher) — Windows, macOS, ChromeOS, Linux
 * **Opera**, **Brave**, and other Chromium-based browsers
 
+> **Note for Linux users:** While Windows, macOS, and ChromeOS work with zero configuration, Linux requires a one-time `udev` permission rule. See [Linux Setup (udev rules)](#linux-setup) below.
+
 #### ~ hint
 WebHID is enabled by default in all modern Chromium browsers. No flags or special configuration changes in `chrome://flags` are needed!
 #### ~
@@ -42,6 +44,44 @@ WebHID is enabled by default in all modern Chromium browsers. No flags or specia
 * A typical 100 KB program downloads in just **0.4–0.8 seconds**!
 * USB WebHID is the fastest and most reliable download method available in BrickCode.
 
+## Linux Setup (udev rules) #linux-setup
+
+On Windows, macOS, and ChromeOS, USB WebHID works out of the box with zero configuration.
+
+On Linux, raw USB HID devices (`/dev/hidraw*`) are owned by `root` with restricted permissions by default. To allow your web browser to open the EV3 brick as a standard user without `sudo`, you must install a `udev` permission rule:
+
+### 1. Add the udev rule
+
+Run the following command in a terminal to create the rule file:
+
+```bash
+echo 'SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0005", MODE="0666", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/99-lego-ev3.rules
+```
+
+### 2. Reload and apply rules
+
+Reload the udev rules immediately without rebooting:
+
+```bash
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+### 3. Reconnect the EV3
+
+Unplug the USB cable from your computer and plug it back in. Your browser will now be able to connect to the EV3 brick directly!
+
+#### ~ hint
+### Browser sandbox note (Snap / Flatpak)
+If you installed Chromium or Google Chrome through **Snap** (default on Ubuntu) or **Flatpak**, the application sandbox may block access to `/dev/hidraw*` devices even when the udev rule is installed.
+
+If you encounter permission issues, install the native `.deb` or `.rpm` package for your browser (e.g. from the official [Google Chrome](https://www.google.com/chrome/) download page), or configure your package manager to allow raw USB device access for the browser.
+#### ~
+
+### No administrator (sudo) privileges?
+If you are using a managed Linux computer (such as a school, library, or contest workstation) where you do not have `sudo` access to install udev rules, you can still download your code:
+* **[File Transfer (UF2 Drag & Drop)](/troubleshoot):** Connect the EV3 via USB — the `EV3` drive mounts as a standard flash drive without requiring root privileges. Download the `.uf2` file and copy it directly to the drive.
+* **[Bluetooth Web Serial](/bluetooth):** Connect your EV3 wirelessly over Bluetooth.
+
 ## Troubleshooting
 
 ### EV3 is not appearing in the browser device picker
@@ -50,6 +90,10 @@ WebHID is enabled by default in all modern Chromium browsers. No flags or specia
 * **Check the port:** Verify that the cable is connected to the **PC** miniUSB port on top of the EV3, not the **Host** port.
 * **Check the brick screen:** Make sure the **USB** indicator appears next to the battery icon. If it is not showing, try unplugging and firmly reconnecting the cable.
 * **Try a direct USB port:** If connecting through an unpowered USB hub or keyboard passthrough, try plugging directly into your computer's motherboard or laptop USB port.
+
+### "Failed to open the device" or Access Denied on Linux
+* On Linux, this error indicates missing permissions for `/dev/hidraw*`. Follow the steps in [Linux Setup (udev rules)](#linux-setup) above to install the rule, reload udev, and reconnect the USB cable.
+* If using a Snap or Flatpak package of Chrome/Chromium, try using the native `.deb` / `.rpm` package.
 
 ### Could not connect or device is busy
 * **Close conflicting applications:** Only one application can access the EV3 USB interface at a time. Completely close official LEGO software (**EV3 Lab / MINDSTORMS EV3**, **EV3 Classroom**), other **BrickCode tabs**, or any other tools communicating with the EV3.
