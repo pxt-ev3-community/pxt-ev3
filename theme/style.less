@@ -760,19 +760,26 @@ body.pxt-theme-root .modal>.closeIcon {
 /*******************************
     EV3 Asset Editor styling
 *******************************/
-/* Dynamic sidebar: sizes to text across locales, clamped between 155px and 280px */
+/* Fixed sidebar: stable 220px width, never jumps on asset selection */
 .asset-editor-sidebar {
-    width: max-content !important;
-    min-width: 155px !important;
-    max-width: 280px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
     flex-shrink: 0 !important;
+    box-sizing: border-box !important;
 }
 
 .asset-editor-sidebar-info {
     min-width: 0 !important;
 }
 
-/* contain: inline-size prevents image resolution from bloating sidebar max-content */
+.asset-editor-sidebar-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* contain: inline-size prevents image resolution from bloating sidebar */
 .asset-editor-sidebar-preview {
     width: 100% !important;
     min-width: 0 !important;
@@ -882,6 +889,22 @@ body.pxt-theme-root .modal>.closeIcon {
 
     &.selected {
         border: 2px solid var(--pxt-header-stencil, #00838f) !important;
+    }
+}
+
+/* Asset Editor gallery tabs and topbar styling */
+.asset-editor-topbar {
+    border-bottom: 1px solid #8c8c8c !important;
+}
+
+.asset-editor-gallery-tab {
+    border-right: 1px solid #8c8c8c !important;
+    border-bottom: 1px solid #8c8c8c !important;
+
+    &.selected {
+        background-color: var(--pxt-target-background1, #f2f2f2) !important;
+        border-bottom-color: var(--pxt-target-background1, #f2f2f2) !important;
+        border-right: 1px solid #8c8c8c !important;
     }
 }
 
