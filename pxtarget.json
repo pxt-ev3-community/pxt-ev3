@@ -214,6 +214,9 @@
         "assetEditor": {
             "image": true
         },
+        "monacoFieldEditors": [
+            "image-editor"
+        ],
         "enabledFeatures": {
             "blocksErrorList": {}
         },
