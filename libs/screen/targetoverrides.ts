@@ -371,7 +371,8 @@ namespace brick {
     //% block="draw image %image at x $x y $y"
     //% weight=99
     //% blockGap=18
-    //% group="Screen"
+    //% group="Draw"
+    //% blockNamespace="images"
     //% help=brick/draw-image
     //% inlineInputMode=inline
     //% image.shadow=screen_sprite_image
@@ -381,20 +382,8 @@ namespace brick {
         screen.drawImage(image, x, y);
     }
 
-    /**
-     * Returns the width or height of an image.
-     * @param picture The image to get the width or height of
-     * @param dimension The dimension to get
-     */
-    //% blockId=image_get_dimension
-    //% block="$picture $dimension"
-    //% weight=98
-    //% blockGap=8
-    //% group="Screen"
-    //% help=brick/image-dimension
-    //% picture.shadow=screen_sprite_image
-    export function imageDimension(picture: Image, dimension: image.Dimension): number {
-        return picture ? image.getDimension(picture, dimension) : 0;
+    export function setCustomScreenMode() {
+        screenMode = ScreenMode.Custom;
     }
 
     /**
