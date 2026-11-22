@@ -50,24 +50,6 @@ namespace images {
         return picture ? picture.clone() : null;
     }
 
-    /**
-     * Scroll image pixels by dx and dy
-     * @param picture The image to scroll
-     * @param dx horizontal displacement
-     * @param dy vertical displacement
-     */
-    //% blockId=image_scroll
-    //% block="$picture scroll x $dx y $dy"
-    //% weight=70
-    //% group="Transform"
-    //% picture.shadow=variables_get
-    //% picture.defl=picture
-    //% dx.defl=1 dy.defl=0
-    //% help=images/scroll
-    export function scrollImage(picture: Image, dx: number, dy: number): void {
-        if (picture) picture.scroll(dx, dy);
-    }
-
     function prepareImage(picture: Image): boolean {
         if (!picture) return false;
         if (picture === screen) {
@@ -263,9 +245,34 @@ namespace images {
     //% cx.defl=10 cy.defl=10 r.defl=5
     //% help=images/draw-circle
     export function drawCircle(picture: Image, cx: number, cy: number, r: number): void {
-        if (prepareImage(picture)) {
-            if (r < 0) r = -r;
-            picture.drawCircle(cx, cy, r, 1);
+        if (!prepareImage(picture)) return;
+        cx |= 0;
+        cy |= 0;
+        r = Math.abs(r | 0);
+        if (r === 0) {
+            picture.setPixel(cx, cy, 1);
+            return;
+        }
+        let x = 0;
+        let y = r;
+        let d = 3 - 2 * r;
+
+        while (y >= x) {
+            picture.setPixel(cx + x, cy + y, 1);
+            picture.setPixel(cx - x, cy + y, 1);
+            picture.setPixel(cx + x, cy - y, 1);
+            picture.setPixel(cx - x, cy - y, 1);
+            picture.setPixel(cx + y, cy + x, 1);
+            picture.setPixel(cx - y, cy + x, 1);
+            picture.setPixel(cx + y, cy - x, 1);
+            picture.setPixel(cx - y, cy - x, 1);
+            if (d > 0) {
+                d += 4 * (x - y) + 10;
+                y--;
+            } else {
+                d += 4 * x + 6;
+            }
+            x++;
         }
     }
 
@@ -285,9 +292,39 @@ namespace images {
     //% cx.defl=10 cy.defl=10 r.defl=5
     //% help=images/fill-circle
     export function fillCircle(picture: Image, cx: number, cy: number, r: number): void {
-        if (prepareImage(picture)) {
-            if (r < 0) r = -r;
-            picture.fillCircle(cx, cy, r, 1);
+        if (!prepareImage(picture)) return;
+        cx |= 0;
+        cy |= 0;
+        r = Math.abs(r | 0);
+        if (r === 0) {
+            picture.setPixel(cx, cy, 1);
+            return;
+        }
+        let x = 0;
+        let y = r;
+        let d = 3 - 2 * r;
+
+        const drawH = (x0: number, x1: number, yPos: number) => {
+            if (yPos < 0 || yPos >= picture.height) return;
+            x0 = Math.max(0, x0);
+            x1 = Math.min(picture.width - 1, x1);
+            if (x0 <= x1) {
+                picture.drawLine(x0, yPos, x1, yPos, 1);
+            }
+        };
+
+        while (y >= x) {
+            drawH(cx - x, cx + x, cy - y);
+            drawH(cx - x, cx + x, cy + y);
+            drawH(cx - y, cx + y, cy - x);
+            drawH(cx - y, cx + y, cy + x);
+            if (d > 0) {
+                d += 4 * (x - y) + 10;
+                y--;
+            } else {
+                d += 4 * x + 6;
+            }
+            x++;
         }
     }
 }
