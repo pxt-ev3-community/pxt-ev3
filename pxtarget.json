@@ -81,6 +81,15 @@
         "textBlocks": true,
         "listsBlocks": true,
         "functionBlocks": true,
+        "functionsOptions": {
+            "extraFunctionEditorTypes": [
+                {
+                    "typeName": "Image",
+                    "icon": "image outline",
+                    "defaultName": "myImage"
+                }
+            ]
+        },
         "onStartNamespace": "basic",
         "onStartWeight": 100,
         "onStartColor": "#009FE3",
@@ -93,7 +102,33 @@
         },
         "breakBlock": true,
         "continueBlock": true,
-        "bannedCategories": ["images"]
+        "bannedCategories": [],
+        "palette": [
+            "#ffffff",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "paletteNames": [
+            "transparent",
+            "black"
+        ],
+        "screenSize": {
+            "width": 178,
+            "height": 128
+        }
     },
     "compileService": {
         "buildEngine": "dockermake",
@@ -176,6 +211,12 @@
         "importExtensionFiles": true,
         "allowPackageExtensions": true,
         "addNewTypeScriptFile": true,
+        "assetEditor": {
+            "image": true
+        },
+        "monacoFieldEditors": [
+            "image-editor"
+        ],
         "enabledFeatures": {
             "blocksErrorList": {}
         },
@@ -192,6 +233,7 @@
         },
         "blockColors": {
             "basic": "#009FE3",
+            "images": "#A5A9B4",
             "loops": "#58AB41",
             "logic": "#1E5AA8",
             "math": "#7396C8",
@@ -203,6 +245,7 @@
             "arrays": "#901F76"
         },
         "blockIcons": {
+            "images": "\uf03e",
             "loops": "\uf10b",
             "logic": "\uf10a",
             "math": "\uf10c",

@@ -435,6 +435,8 @@ namespace pxsim.visuals {
             this.screenCanvasCtx = this.screenCanvas.getContext("2d");
 
             this.screenCanvasTemp = document.createElement("canvas");
+            this.screenCanvasTemp.width = SCREEN_WIDTH;
+            this.screenCanvasTemp.height = SCREEN_HEIGHT;
             this.screenCanvasTemp.style.display = 'none';
         }
 
@@ -574,23 +576,21 @@ namespace pxsim.visuals {
 
             this.screenCanvas.style.top = `${bBox.top + 1}px`;
             this.screenCanvas.style.left = `${bBox.left + ((bBox.width - this.screenScaledWidth) * 0.5)}px`;
-            this.screenCanvas.width = this.screenScaledWidth;
-            this.screenCanvas.height = this.screenScaledHeight;
+            this.screenCanvas.style.width = `${this.screenScaledWidth}px`;
+            this.screenCanvas.style.height = `${this.screenScaledHeight}px`;
 
             this.screenCanvas.style.cursor = !isLandscape ? "zoom-in" : "zoom-out";
 
-            this.screenCanvasData = this.screenCanvasCtx.getImageData(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+            if (this.screenCanvas.width !== SCREEN_WIDTH || this.screenCanvas.height !== SCREEN_HEIGHT) {
+                this.screenCanvas.width = SCREEN_WIDTH;
+                this.screenCanvas.height = SCREEN_HEIGHT;
+            }
 
-            new Uint32Array(this.screenCanvasData.data.buffer).set(state.screen)
-
-            // Move the image to another canvas element in order to scale it
-            this.screenCanvasTemp.style.width = `${SCREEN_WIDTH}`;
-            this.screenCanvasTemp.style.height = `${SCREEN_HEIGHT}`;
-
-            this.screenCanvasTemp.getContext("2d").putImageData(this.screenCanvasData, 0, 0);
-
-            this.screenCanvasCtx.scale(scale, scale);
-            this.screenCanvasCtx.drawImage(this.screenCanvasTemp, 0, 0);
+            if (!this.screenCanvasData) {
+                this.screenCanvasData = this.screenCanvasCtx.createImageData(SCREEN_WIDTH, SCREEN_HEIGHT);
+            }
+            new Uint32Array(this.screenCanvasData.data.buffer).set(state.screen);
+            this.screenCanvasCtx.putImageData(this.screenCanvasData, 0, 0);
         }
 
         private updateXY(width: number, height: number) {

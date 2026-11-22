@@ -66,7 +66,6 @@
 }
 
 
-
 /*******************************
     Menu bar
 *******************************/
@@ -132,7 +131,6 @@
 .ui.item.link.exit-debugmode-btn {
     background: none !important;
 }
-
 
 
 /* Editor menu dropdown */
@@ -385,7 +383,6 @@
 .ui.button.icon-and-text.label {
     flex-shrink: 0;
 }
-
 
 
 
@@ -756,4 +753,198 @@ body.pxt-theme-root .modal>.closeIcon {
 .blocks-menuitem i.icon.blocks:before {
     font-family: 'legoIcons' !important;
     content: "\f119" !important;
+}
+
+
+
+/*******************************
+    EV3 Asset Editor styling
+*******************************/
+/* Fixed sidebar: stable 220px width, never jumps on asset selection */
+.asset-editor-sidebar {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+    flex-shrink: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.asset-editor-sidebar-info {
+    min-width: 0 !important;
+}
+
+.asset-editor-sidebar-name {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* contain: inline-size prevents image resolution from bloating sidebar */
+.asset-editor-sidebar-preview {
+    width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 1 !important;
+    height: auto !important;
+    margin: 0.5rem auto !important;
+    contain: inline-size;
+
+    .asset-editor-preview img {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
+/* Button stack: sized to the widest button and centered horizontally */
+.asset-editor-sidebar-controls {
+    width: max-content !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+
+    .common-list-item {
+        width: 100% !important;
+        display: flex !important;
+    }
+}
+
+/* Hide multi-color palette (EV3 is monochrome only) */
+.asset-palette-button {
+    display: none !important;
+}
+
+/* EV3 sidebar buttons: flat styling, prevent ellipsis truncation */
+.asset-editor-button {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-neutral-foreground1) !important;
+    margin: 0 0 0.35rem 0 !important;
+    padding: 0.55rem 0.75rem !important;
+    width: 100% !important;
+    min-width: max-content !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    font-size: 0.95rem !important;
+    cursor: pointer !important;
+
+    &:hover, &:focus {
+        background-color: var(--pxt-neutral-alpha20) !important;
+        color: var(--pxt-neutral-base, #333333) !important;
+    }
+
+    .common-button-flex {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: max-content !important;
+        min-width: 100% !important;
+        text-align: left !important;
+    }
+
+    i.icon {
+        width: 1.25rem !important;
+        min-width: 1.25rem !important;
+        text-align: center !important;
+        margin: 0 0.5rem 0 0 !important;
+        font-size: 1rem !important;
+        display: inline-block !important;
+        opacity: 0.85;
+    }
+
+    .common-button-label {
+        flex: 1 !important;
+        text-align: left !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+}
+
+/* EV3-styled "+ New Asset" tile: remove arcade green, use clean EV3 dashed card */
+.create-new.common-button {
+    background-color: var(--pxt-neutral-alpha10) !important;
+    color: var(--pxt-header-stencil, #00838f) !important;
+    border: 2px dashed var(--pxt-neutral-alpha30) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+
+    &:hover {
+        background-color: var(--pxt-neutral-alpha20) !important;
+        border-color: var(--pxt-header-stencil, #00838f) !important;
+    }
+}
+
+/* EV3-styled asset cards */
+.asset-editor-card {
+    border-radius: 6px !important;
+    border: 1px solid var(--pxt-neutral-stencil1) !important;
+    box-shadow: none !important;
+    overflow: hidden;
+
+    &.selected {
+        border: 2px solid var(--pxt-header-stencil, #00838f) !important;
+    }
+}
+
+/* Asset Editor gallery tabs and topbar styling */
+.asset-editor-topbar {
+    border-bottom: 1px solid #8c8c8c !important;
+}
+
+.asset-editor-gallery-tab {
+    border-right: 1px solid #8c8c8c !important;
+    border-bottom: 1px solid #8c8c8c !important;
+
+    &.selected {
+        background-color: var(--pxt-target-background1, #f2f2f2) !important;
+        border-bottom-color: var(--pxt-target-background1, #f2f2f2) !important;
+        border-right: 1px solid #8c8c8c !important;
+    }
+}
+
+/* Hide extraneous color swatches in the sprite editor (keep only Transparent [1] and Black [2]) */
+.image-editor-color-buttons .image-editor-button:nth-child(n+3) {
+    display: none !important;
+}
+
+/* Delete asset modal and common modal footer buttons */
+.common-modal-footer button:only-child {
+    justify-self: end !important;
+    width: auto !important;
+}
+
+.common-modal-footer .common-button {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.asset-editor-delete-dialog .common-modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    padding: 1rem !important;
+
+    .common-button {
+        width: auto !important;
+        min-width: 8rem !important;
+        margin: 0 !important;
+        padding: 0.78571429em 1.5em !important;
+        min-height: 2.75rem !important;
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        line-height: 1em !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.5rem !important;
+    }
 }
