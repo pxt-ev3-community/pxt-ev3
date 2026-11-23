@@ -112,12 +112,14 @@ namespace images {
      * @param y0 start y
      * @param x1 end x
      * @param y1 end y
+     * @param width line thickness, eg: 1
      */
     //% blockId=image_draw_line
-    //% block="$picture draw line from x $x0 y $y0 to x $x1 y $y1 width $width"
+    //% block="$picture draw line from x $x0 y $y0 to x $x1 y $y1||width $width"
     //% weight=85
     //% group="Draw"
     //% inlineInputMode=inline
+    //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% x0.defl=0 y0.defl=0 x1.defl=10 y1.defl=10
     //% width.defl=1 width.min=1 width.max=50
@@ -191,10 +193,11 @@ namespace images {
      * @param lineWidth line thickness, eg: 1
      */
     //% blockId=image_draw_rect
-    //% block="$picture draw rectangle at x $x y $y width $w height $h line width $lineWidth"
+    //% block="$picture draw rectangle at x $x y $y width $w height $h||line width $lineWidth"
     //% weight=80
     //% group="Draw"
     //% inlineInputMode=inline
+    //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% x.defl=0 y.defl=0 w.defl=20 h.defl=20
     //% lineWidth.defl=1 lineWidth.min=1 lineWidth.max=50
@@ -263,10 +266,11 @@ namespace images {
      * @param width line thickness, eg: 1
      */
     //% blockId=image_draw_circle
-    //% block="$picture draw circle at cx $cx cy $cy radius $r width $width"
+    //% block="$picture draw circle at cx $cx cy $cy radius $r||width $width"
     //% weight=70
     //% group="Draw"
     //% inlineInputMode=inline
+    //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% cx.defl=10 cy.defl=10 r.defl=5
     //% width.defl=1 width.min=1 width.max=50
