@@ -235,44 +235,122 @@ namespace images {
      * @param cx center x
      * @param cy center y
      * @param r radius
+     * @param width line thickness, eg: 1
      */
     //% blockId=image_draw_circle
-    //% block="$picture draw circle at cx $cx cy $cy radius $r"
+    //% block="$picture draw circle at cx $cx cy $cy radius $r width $width"
     //% weight=70
     //% group="Draw"
     //% inlineInputMode=inline
     //% picture.shadow=screen_image
     //% cx.defl=10 cy.defl=10 r.defl=5
+    //% width.defl=1 width.min=1 width.max=50
     //% help=images/draw-circle
-    export function drawCircle(picture: Image, cx: number, cy: number, r: number): void {
+    export function drawCircle(picture: Image, cx: number, cy: number, r: number, width: number = 1): void {
         if (!prepareImage(picture)) return;
         cx |= 0;
         cy |= 0;
         r = Math.abs(r | 0);
+        width = Math.max(1, width | 0);
+
         if (r === 0) {
-            picture.setPixel(cx, cy, 1);
+            if (width <= 1) {
+                picture.setPixel(cx, cy, 1);
+            } else {
+                fillCircle(picture, cx, cy, (width - 1) >> 1);
+            }
             return;
         }
-        let x = 0;
-        let y = r;
-        let d = 3 - 2 * r;
 
-        while (y >= x) {
-            picture.setPixel(cx + x, cy + y, 1);
-            picture.setPixel(cx - x, cy + y, 1);
-            picture.setPixel(cx + x, cy - y, 1);
-            picture.setPixel(cx - x, cy - y, 1);
-            picture.setPixel(cx + y, cy + x, 1);
-            picture.setPixel(cx - y, cy + x, 1);
-            picture.setPixel(cx + y, cy - x, 1);
-            picture.setPixel(cx - y, cy - x, 1);
-            if (d > 0) {
-                d += 4 * (x - y) + 10;
-                y--;
-            } else {
-                d += 4 * x + 6;
+        if (width <= 1) {
+            let x = 0;
+            let y = r;
+            let d = 3 - 2 * r;
+
+            while (y >= x) {
+                picture.setPixel(cx + x, cy + y, 1);
+                picture.setPixel(cx - x, cy + y, 1);
+                picture.setPixel(cx + x, cy - y, 1);
+                picture.setPixel(cx - x, cy - y, 1);
+                picture.setPixel(cx + y, cy + x, 1);
+                picture.setPixel(cx - y, cy + x, 1);
+                picture.setPixel(cx + y, cy - x, 1);
+                picture.setPixel(cx - y, cy - x, 1);
+                if (d > 0) {
+                    d += 4 * (x - y) + 10;
+                    y--;
+                } else {
+                    d += 4 * x + 6;
+                }
+                x++;
             }
-            x++;
+            return;
+        }
+
+        const rOut = r + ((width - 1) >> 1);
+        const rIn = rOut - width + 1;
+        const rInner = rIn - 1;
+
+        if (rInner < 0) {
+            fillCircle(picture, cx, cy, rOut);
+            return;
+        }
+
+        const computeXSpans = (rad: number): number[] => {
+            const spans: number[] = [];
+            for (let i = 0; i <= rad; ++i) spans.push(0);
+            let x = 0;
+            let y = rad;
+            let d = 3 - 2 * rad;
+            while (y >= x) {
+                if (x > spans[y]) spans[y] = x;
+                if (y > spans[x]) spans[x] = y;
+                if (d > 0) {
+                    d += 4 * (x - y) + 10;
+                    y--;
+                } else {
+                    d += 4 * x + 6;
+                }
+                x++;
+            }
+            return spans;
+        };
+
+        const xOuter = computeXSpans(rOut);
+        const xInner = computeXSpans(rInner);
+
+        const drawH = (x0: number, x1: number, yPos: number) => {
+            if (yPos < 0 || yPos >= picture.height) return;
+            x0 = Math.max(0, x0);
+            x1 = Math.min(picture.width - 1, x1);
+            if (x0 <= x1) {
+                picture.drawLine(x0, yPos, x1, yPos, 1);
+            }
+        };
+
+        for (let dy = 0; dy <= rOut; ++dy) {
+            const xOut = xOuter[dy];
+            const hasHole = dy <= rInner;
+            const yTop = cy - dy;
+            const yBottom = cy + dy;
+
+            if (hasHole) {
+                const xIn = xInner[dy];
+                // Left span
+                drawH(cx - xOut, cx - xIn - 1, yTop);
+                // Right span
+                drawH(cx + xIn + 1, cx + xOut, yTop);
+                if (dy !== 0) {
+                    drawH(cx - xOut, cx - xIn - 1, yBottom);
+                    drawH(cx + xIn + 1, cx + xOut, yBottom);
+                }
+            } else {
+                // Full span across the circle
+                drawH(cx - xOut, cx + xOut, yTop);
+                if (dy !== 0) {
+                    drawH(cx - xOut, cx + xOut, yBottom);
+                }
+            }
         }
     }
 
