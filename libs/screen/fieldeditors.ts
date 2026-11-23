@@ -190,47 +190,47 @@ namespace images {
      * @param y top-left y
      * @param w width
      * @param h height
-     * @param lineWidth line thickness, eg: 1
+     * @param width line thickness, eg: 1
      */
     //% blockId=image_draw_rect
-    //% block="$picture draw rectangle at x $x y $y width $w height $h||line width $lineWidth"
+    //% block="$picture draw rectangle at x $x y $y width $w height $h||width $width"
     //% weight=80
     //% group="Draw"
     //% inlineInputMode=inline
     //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% x.defl=0 y.defl=0 w.defl=20 h.defl=20
-    //% lineWidth.defl=1 lineWidth.min=1 lineWidth.max=50
+    //% width.defl=1 width.min=1 width.max=50
     //% help=images/draw-rect
-    export function drawRect(picture: Image, x: number, y: number, w: number, h: number, lineWidth: number = 1): void {
+    export function drawRect(picture: Image, x: number, y: number, w: number, h: number, width: number = 1): void {
         if (!prepareImage(picture)) return;
         x |= 0;
         y |= 0;
         w |= 0;
         h |= 0;
-        lineWidth = Math.max(1, lineWidth | 0);
+        width = Math.max(1, width | 0);
         if (w < 0) { x += w; w = -w; }
         if (h < 0) { y += h; h = -h; }
         if (w === 0 || h === 0) return;
 
-        if (lineWidth <= 1) {
+        if (width <= 1) {
             picture.drawRect(x, y, w, h, 1);
             return;
         }
 
-        if (2 * lineWidth >= w || 2 * lineWidth >= h) {
+        if (2 * width >= w || 2 * width >= h) {
             picture.fillRect(x, y, w, h, 1);
             return;
         }
 
         // Top bar
-        picture.fillRect(x, y, w, lineWidth, 1);
+        picture.fillRect(x, y, w, width, 1);
         // Bottom bar
-        picture.fillRect(x, y + h - lineWidth, w, lineWidth, 1);
+        picture.fillRect(x, y + h - width, w, width, 1);
         // Left bar
-        picture.fillRect(x, y + lineWidth, lineWidth, h - 2 * lineWidth, 1);
+        picture.fillRect(x, y + width, width, h - 2 * width, 1);
         // Right bar
-        picture.fillRect(x + w - lineWidth, y + lineWidth, lineWidth, h - 2 * lineWidth, 1);
+        picture.fillRect(x + w - width, y + width, width, h - 2 * width, 1);
     }
 
     /**
