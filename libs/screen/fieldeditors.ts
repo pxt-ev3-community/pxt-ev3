@@ -122,7 +122,7 @@ namespace images {
     //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% x0.defl=0 y0.defl=0 x1.defl=10 y1.defl=10
-    //% width.defl=1 width.min=1 width.max=50
+    //% width.defl=1 width.min=1 width.max=10
     //% help=images/draw-line
     export function drawLine(picture: Image, x0: number, y0: number, x1: number, y1: number, width: number = 1): void {
         if (!prepareImage(picture)) return;
@@ -200,7 +200,7 @@ namespace images {
     //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% x.defl=0 y.defl=0 w.defl=20 h.defl=20
-    //% width.defl=1 width.min=1 width.max=50
+    //% width.defl=1 width.min=1 width.max=10
     //% help=images/draw-rect
     export function drawRect(picture: Image, x: number, y: number, w: number, h: number, width: number = 1): void {
         if (!prepareImage(picture)) return;
@@ -273,7 +273,7 @@ namespace images {
     //% expandableArgumentMode=toggle
     //% picture.shadow=screen_image
     //% cx.defl=10 cy.defl=10 r.defl=5
-    //% width.defl=1 width.min=1 width.max=50
+    //% width.defl=1 width.min=1 width.max=10
     //% help=images/draw-circle
     export function drawCircle(picture: Image, cx: number, cy: number, r: number, width: number = 1): void {
         if (!prepareImage(picture)) return;
